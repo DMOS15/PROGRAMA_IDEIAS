@@ -38,7 +38,7 @@ async function getPageData() {
   const cancelled = data.canceladas || [];
   pageState.ideas = (data.ideias || []).map((idea) => { const cancel = cancelled.find((item) => String(item.numero) === String(idea.numero)); return cancel ? { ...idea, status: 'Cancelado', motivoCancelamento: cancel.motivo || cancel.descricao || cancel.descricaoCurta } : idea; });
   const dmos = data.baseDmos || [];
-  pageState.people = (data.cadastro || []).filter((person) => pageNormalize(person.status) === 'ativo').map((person) => ({ ...person, dmos: dmos.find((entry) => samePerson(entry.nome, person.nome)), ideas: pageState.ideas.filter((idea) => samePerson(idea.autor, person.nome) || samePerson(idea.enviadoPor, person.nome) || dmos.some((entry) => samePerson(entry.nome, person.nome) && samePerson(idea.enviadoPor, entry.nome))) }));
+  pageState.people = (data.cadastro || []).filter((person) => pageNormalize(person.status) === 'ativo').map((person) => ({ ...person, dmos: dmos.find((entry) => samePerson(entry.nome, person.nome)), ideas: pageState.ideas.filter((idea) => samePerson(idea.autor, person.nome) || samePerson(idea.enviadoPor, person.nome) || dmos.some((entry) => samePerson(entry.nome, person.nome) && samePerson(idea.enviadoPor, entry.baseDmos || entry.nome))) }));
   return data;
 }
 window.addEventListener('storage', (event) => {
