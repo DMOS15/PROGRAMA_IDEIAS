@@ -11,15 +11,21 @@ const pageStatusClass = (status) => `status-${pageNormalize(status).replaceAll('
 const nameTokens = (value) => pageNormalize(value).split(/\s+/).filter((token) => token.length > 1);
 function samePerson(left, right) { const a = nameTokens(left); const b = nameTokens(right); if (!a.length || !b.length) return false; if (a.join(' ') === b.join(' ')) return true; const firstMatches = a[0] === b[0] || a[0][0] === b[0][0]; const lastMatches = a[a.length - 1] === b[b.length - 1]; return firstMatches && lastMatches; }
 
-async function loadData() {
+async function getPortalData() {
   const stored = localStorage.getItem('programaIdeiasData');
   if (stored) {
-    try { return JSON.parse(stored); } catch (error) { console.warn('Os dados locais estão inválidos; tentando dados/ideias.json.', error); }
+    try {
+      const data = JSON.parse(stored);
+      console.info('Origem dos dados carregada: localStorage');
+      return data;
+    } catch (error) { console.warn('Os dados locais estão inválidos; tentando dados/ideias.json.', error); }
   }
   try {
     const response = await fetch('dados/ideias.json', { cache: 'no-store' });
     if (!response.ok) throw new Error(`Falha ao carregar dados/ideias.json: ${response.status}`);
-    return await response.json();
+    const data = await response.json();
+    console.info('Origem dos dados carregada: ideias.json');
+    return data;
   } catch (error) {
     console.error('Não foi possível carregar os dados locais nem dados/ideias.json.', error);
     return PORTAL_FALLBACK;
@@ -27,7 +33,7 @@ async function loadData() {
 }
 
 async function getPageData() {
-  const data = await loadData();
+  const data = await getPortalData();
   pageState.metadata = data.metadata || {};
   const cancelled = data.canceladas || [];
   pageState.ideas = (data.ideias || []).map((idea) => { const cancel = cancelled.find((item) => String(item.numero) === String(idea.numero)); return cancel ? { ...idea, status: 'Cancelado', motivoCancelamento: cancel.motivo || cancel.descricao || cancel.descricaoCurta } : idea; });
