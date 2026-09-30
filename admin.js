@@ -1,7 +1,8 @@
 const admin$ = (selector) => document.querySelector(selector);
-const adminNormalize = (value) => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+const adminNormalize = (value) => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().replace(/\s+/g, ' ').toLowerCase();
 const findSheet = (workbook, names) => { const wanted = names.map(adminNormalize); const sheetName = workbook.SheetNames.find((name) => wanted.includes(adminNormalize(name)) || wanted.some((item) => adminNormalize(name).includes(item))); return sheetName ? workbook.Sheets[sheetName] : null; };
-const valueOf = (row, names) => { const key = Object.keys(row).find((candidate) => names.some((name) => adminNormalize(candidate) === adminNormalize(name))); return key ? row[key] : ''; };
+const valueOf = (row, names) => { const key = Object.keys(row).find((candidate) => names.some((name) => adminNormalize(candidate) === adminNormalize(name))); const value = key ? row[key] : ''; return typeof value === 'string' ? value.trim().replace(/\s+/g, ' ') : value; };
+const uniqueAreas = (values) => [...new Map(values.map((value) => String(value || '').trim().replace(/\s+/g, ' ')).filter(Boolean).map((value) => [adminNormalize(value), value])).values()].sort((left, right) => left.localeCompare(right, 'pt-BR'));
 const emptyData = () => ({ metadata: {}, cadastro: [], baseDmos: [], ideias: [], canceladas: [], reconhecidas: { trimestre: [], semestre: [] } });
 
 admin$('#admin-pin-form').addEventListener('submit', (event) => { event.preventDefault(); if (admin$('#admin-pin').value === 'JDEPIU') { admin$('#admin-gate').style.display = 'none'; admin$('#admin-panel').style.display = 'block'; } else admin$('#admin-error').textContent = 'PIN incorreto. Tente novamente.'; });
@@ -22,7 +23,13 @@ admin$('#excel-upload').addEventListener('change', async (event) => {
       data = { metadata: { updatedAt: new Date().toISOString(), version: '1.0.0', updateReason: 'Upload via administração', updatedBy: 'Administração' }, cadastro: peopleRows.filter((row) => adminNormalize(valueOf(row, ['STATUS', 'Status'])) === 'ativo').map((row) => ({ nome: valueOf(row, ['NOME', 'Nome']), turno: valueOf(row, ['TURNO', 'Turno']), turnoComp: valueOf(row, ['TURNO COMP']), coordenador: valueOf(row, ['COORDENADOR', 'Coordenador']), funcao: valueOf(row, ['FUNÇÃO', 'Função']), status: valueOf(row, ['STATUS', 'Status']), area: valueOf(row, ['ÁREA', 'Área']) })), baseDmos: dmosRows.map((row) => ({ nome: valueOf(row, ['NOME', 'Nome']), tipo: valueOf(row, ['TIPO', 'Tipo']), cargo: valueOf(row, ['CARGO', 'Cargo']), area: valueOf(row, ['AREA', 'Área']), coordenador: valueOf(row, ['COORDENADOR', 'Coordenador']) })), ideias: ideaRows.map((row) => ({ numero: valueOf(row, ['Número', 'Numero']), descricaoCurta: valueOf(row, ['Descrição curta']), descricao: valueOf(row, ['Descrição', 'Descrição da dúvida']), status: valueOf(row, ['Status']), enviadoPor: valueOf(row, ['Enviado por']), categoria: valueOf(row, ['Categoria']), subcategoria: valueOf(row, ['Sub categoria']), criada: valueOf(row, ['Criada']), areaTrabalho: valueOf(row, ['Área de trabalho']), atualizado: valueOf(row, ['Atualizado']), atribuidoA: valueOf(row, ['Atribuído a', 'Atribuído']), grupoAtribuicao: valueOf(row, ['Grupo de atribuição']), fechado: valueOf(row, ['Fechado']), grupo: valueOf(row, ['Grupo']), autor: valueOf(row, ['Enviado por']) })), canceladas: cancelRows.map((row) => ({ numero: valueOf(row, ['Número', 'Numero']), motivo: valueOf(row, ['Descrição curta', 'Descrição', 'Motivo do cancelamento']) })).filter((row) => row.numero), reconhecidas: { trimestre: [], semestre: [] } };
     }
     localStorage.setItem('programaIdeiasData', JSON.stringify(data));
-    const areaCount = new Set((data.ideias || []).map((idea) => idea.grupo).filter(Boolean)).size;
+    const cadastroAreas = uniqueAreas((data.cadastro || []).map((person) => person.area));
+    const ideaAreas = uniqueAreas((data.ideias || []).map((idea) => idea.areaTrabalho || idea.grupo));
+    const dmosAreas = uniqueAreas((data.baseDmos || []).map((person) => person.area));
+    console.info('[Importação] Áreas únicas no CADASTRO:', cadastroAreas);
+    console.info('[Importação] Áreas únicas nas IDEIAS (Área de trabalho/Grupo):', ideaAreas);
+    console.info('[Importação] Áreas únicas na BASE DMOS:', dmosAreas);
+    const areaCount = cadastroAreas.length || ideaAreas.length || dmosAreas.length;
     admin$('#upload-message').textContent = `Arquivo processado: ${data.ideias.length} ideias, ${data.cadastro.length} colaboradores e ${areaCount} áreas.`;
     admin$('#history-body').insertAdjacentHTML('afterbegin', `<tr><td>${new Date().toLocaleString('pt-BR')}</td><td>${file.name}</td><td>Upload administrativo</td><td>${data.ideias.length}</td><td>${data.cadastro.length}</td><td>${areaCount}</td></tr>`);
   } catch (error) { admin$('#upload-message').style.color = 'var(--red)'; admin$('#upload-message').textContent = 'Não foi possível processar o arquivo. Verifique as abas e colunas.'; }

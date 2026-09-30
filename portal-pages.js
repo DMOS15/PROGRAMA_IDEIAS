@@ -11,9 +11,23 @@ const pageStatusClass = (status) => `status-${pageNormalize(status).replaceAll('
 const nameTokens = (value) => pageNormalize(value).split(/\s+/).filter((token) => token.length > 1);
 function samePerson(left, right) { const a = nameTokens(left); const b = nameTokens(right); if (!a.length || !b.length) return false; if (a.join(' ') === b.join(' ')) return true; const firstMatches = a[0] === b[0] || a[0][0] === b[0][0]; const lastMatches = a[a.length - 1] === b[b.length - 1]; return firstMatches && lastMatches; }
 
+async function loadData() {
+  const stored = localStorage.getItem('programaIdeiasData');
+  if (stored) {
+    try { return JSON.parse(stored); } catch (error) { console.warn('Os dados locais estão inválidos; tentando dados/ideias.json.', error); }
+  }
+  try {
+    const response = await fetch('dados/ideias.json', { cache: 'no-store' });
+    if (!response.ok) throw new Error(`Falha ao carregar dados/ideias.json: ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    console.error('Não foi possível carregar os dados locais nem dados/ideias.json.', error);
+    return PORTAL_FALLBACK;
+  }
+}
+
 async function getPageData() {
-  let data = PORTAL_FALLBACK;
-  try { const response = await fetch('dados/ideias.json', { cache: 'no-store' }); data = await response.json(); } catch (error) { const local = localStorage.getItem('programaIdeiasData'); if (local) data = JSON.parse(local); }
+  const data = await loadData();
   pageState.metadata = data.metadata || {};
   const cancelled = data.canceladas || [];
   pageState.ideas = (data.ideias || []).map((idea) => { const cancel = cancelled.find((item) => String(item.numero) === String(idea.numero)); return cancel ? { ...idea, status: 'Cancelado', motivoCancelamento: cancel.motivo || cancel.descricao || cancel.descricaoCurta } : idea; });
@@ -21,6 +35,9 @@ async function getPageData() {
   pageState.people = (data.cadastro || []).filter((person) => pageNormalize(person.status) === 'ativo').map((person) => ({ ...person, dmos: dmos.find((entry) => samePerson(entry.nome, person.nome)), ideas: pageState.ideas.filter((idea) => samePerson(idea.autor, person.nome) || samePerson(idea.enviadoPor, person.nome) || dmos.some((entry) => samePerson(entry.nome, person.nome) && samePerson(idea.enviadoPor, entry.nome))) }));
   return data;
 }
+window.addEventListener('storage', (event) => {
+  if (event.key === 'programaIdeiasData') location.reload();
+});
 function pageHeader(active) { return `<header class="topbar"><a class="brand" href="colaboradores.html" aria-label="Ir para colaboradores"><span class="brand-mark">+</span><span>Programa de<br><strong>Ideias</strong></span></a><nav class="topnav" aria-label="Navegação principal"><a class="nav-link ${active === 'people' ? 'active' : ''}" href="colaboradores.html">Colaboradores</a><a class="nav-link ${active === 'recognition' ? 'active' : ''}" href="reconhecimento.html">Reconhecimento</a><a class="nav-link ${active === 'coordinators' ? 'active' : ''}" href="coordenadores.html">Coordenadores</a></nav><a class="admin-link ${active === 'admin' ? 'active' : ''}" href="admin.html"><span class="lock-icon">▣</span> Administração</a></header>`; }
 function pageFooter(active) { const update = pageState.metadata.updatedAt ? new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(pageState.metadata.updatedAt)) : 'Não informado'; const totals = active === 'people' ? '' : `<span><strong>${pageState.ideas.length}</strong> ideias carregadas · <strong>${pageState.people.length}</strong> colaboradores ativos</span>`; return `<footer class="site-footer"><span><span class="footer-dot"></span> Última atualização: <strong>${update}</strong></span>${totals}<span>v1.0.0</span></footer>`; }
 function pageLayout(content, active) { document.body.innerHTML = `${pageHeader(active)}<main class="site-main page-main">${content}</main>${pageFooter(active)}`; }
