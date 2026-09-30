@@ -1,0 +1,30 @@
+{
+  "metadata": {"updatedAt":"2026-09-08T06:40:00","version":"1.0.0","updateReason":"Carga demonstrativa inicial","updatedBy":"Administração"},
+  "cadastro": [
+    {"nome":"Marina Alves","turno":"A","coordenador":"Carlos Mendes","funcao":"Operadora de Produção","status":"ATIVO","area":"Montagem","idfxo":"FX-1042"},
+    {"nome":"Rafael Souza","turno":"B","coordenador":"Carlos Mendes","funcao":"Técnico de Processos","status":"ATIVO","area":"Qualidade","idfxo":"FX-1187"},
+    {"nome":"Bianca Oliveira","turno":"A","coordenador":"Juliana Reis","funcao":"Analista de Logística","status":"ATIVO","area":"Logística","idfxo":"FX-0921"},
+    {"nome":"João Pedro Santos","turno":"C","coordenador":"Juliana Reis","funcao":"Operador de Produção","status":"ATIVO","area":"Montagem","idfxo":"FX-1310"},
+    {"nome":"Larissa Costa","turno":"B","coordenador":"Carlos Mendes","funcao":"Engenheira de Melhoria","status":"ATIVO","area":"Engenharia","idfxo":"FX-0784"}
+  ],
+  "baseDmos": [
+    {"nome":"M. Alves","tipo":"Prestador","cargo":"Operadora de Produção","area":"Montagem","coordenador":"Carlos Mendes"},
+    {"nome":"R. Souza","tipo":"Prestador","cargo":"Técnico de Processos","area":"Qualidade","coordenador":"Carlos Mendes"},
+    {"nome":"B. Oliveira","tipo":"Prestador","cargo":"Analista de Logística","area":"Logística","coordenador":"Juliana Reis"},
+    {"nome":"J. P. Santos","tipo":"Prestador","cargo":"Operador de Produção","area":"Montagem","coordenador":"Juliana Reis"},
+    {"nome":"L. Costa","tipo":"Prestador","cargo":"Engenheira de Melhoria","area":"Engenharia","coordenador":"Carlos Mendes"}
+  ],
+  "ideias": [
+    {"numero":"PI-2026-0148","descricaoCurta":"Reduzir tempo de setup da linha 3","status":"Fechado","descricaoDuvida":"Sugestão de sequência visual para troca de ferramentas.","enviadoPor":"M. Alves","categoria":"Produtividade","subcategoria":"Setup","criada":"2026-01-14","atualizado":"2026-03-22","atribuidoA":"Engenharia de Processos","grupoAtribuicao":"Melhoria Contínua","fechado":"2026-03-22","grupo":"Operações","autor":"Marina Alves"},
+    {"numero":"PI-2026-0192","descricaoCurta":"Suporte para mangueiras no posto","status":"Resolvido","descricaoDuvida":"Evitar contato das mangueiras com o piso durante a operação.","enviadoPor":"M. Alves","categoria":"Segurança","subcategoria":"Ergonomia","criada":"2026-02-03","atualizado":"2026-04-02","atribuidoA":"Paulo Nunes","grupoAtribuicao":"Manutenção","fechado":"","grupo":"Operações","autor":"Marina Alves"},
+    {"numero":"PI-2026-0241","descricaoCurta":"Checklist digital de inspeção","status":"Em andamento","descricaoDuvida":"Centralizar as verificações de início de turno.","enviadoPor":"M. Alves","categoria":"Qualidade","subcategoria":"Digitalização","criada":"2026-03-18","atualizado":"2026-05-11","atribuidoA":"Rafael Lima","grupoAtribuicao":"TI Industrial","fechado":"","grupo":"Operações","autor":"Marina Alves"},
+    {"numero":"PI-2026-0117","descricaoCurta":"Identificação de descarte por cor","status":"Cancelado","descricaoDuvida":"Padronizar identificação dos recipientes de descarte.","enviadoPor":"R. Souza","categoria":"Meio Ambiente","subcategoria":"Descarte","criada":"2026-01-08","atualizado":"2026-02-17","atribuidoA":"Bianca Freire","grupoAtribuicao":"EHS","fechado":"","grupo":"Qualidade","autor":"Rafael Souza"},
+    {"numero":"PI-2026-0205","descricaoCurta":"Reaproveitamento de embalagens","status":"Fechado","descricaoDuvida":"Utilizar caixas retornáveis no abastecimento interno.","enviadoPor":"R. Souza","categoria":"Sustentabilidade","subcategoria":"Resíduos","criada":"2026-02-11","atualizado":"2026-04-19","atribuidoA":"Bianca Freire","grupoAtribuicao":"EHS","fechado":"2026-04-19","grupo":"Qualidade","autor":"Rafael Souza"},
+    {"numero":"PI-2026-0227","descricaoCurta":"Rota alternativa para empilhadeiras","status":"Em andamento","descricaoDuvida":"Melhorar o fluxo de abastecimento no corredor norte.","enviadoPor":"B. Oliveira","categoria":"Logística","subcategoria":"Fluxo","criada":"2026-03-02","atualizado":"2026-05-06","atribuidoA":"Diego Ramos","grupoAtribuicao":"Logística","fechado":"","grupo":"Supply Chain","autor":"Bianca Oliveira"},
+    {"numero":"PI-2026-0176","descricaoCurta":"Alerta de validade no almoxarifado","status":"Fechado","descricaoDuvida":"Sinalizar itens próximos da validade no sistema.","enviadoPor":"B. Oliveira","categoria":"Digitalização","subcategoria":"Controle","criada":"2026-01-27","atualizado":"2026-03-27","atribuidoA":"TI Industrial","grupoAtribuicao":"TI Industrial","fechado":"2026-03-27","grupo":"Supply Chain","autor":"Bianca Oliveira"},
+    {"numero":"PI-2026-0255","descricaoCurta":"Proteção acústica no posto 12","status":"Resolvido","descricaoDuvida":"Avaliar barreira acústica para reduzir exposição.","enviadoPor":"J. P. Santos","categoria":"Segurança","subcategoria":"EPI e ambiente","criada":"2026-03-26","atualizado":"2026-05-22","atribuidoA":"EHS","grupoAtribuicao":"EHS","fechado":"","grupo":"Operações","autor":"João Pedro Santos"},
+    {"numero":"PI-2026-0273","descricaoCurta":"Painel de consumo de ar comprimido","status":"Em andamento","descricaoDuvida":"Acompanhar consumo por setor e identificar perdas.","enviadoPor":"L. Costa","categoria":"Produtividade","subcategoria":"Indicadores","criada":"2026-04-09","atualizado":"2026-05-29","atribuidoA":"Engenharia de Processos","grupoAtribuicao":"Melhoria Contínua","fechado":"","grupo":"Engenharia","autor":"Larissa Costa"}
+  ],
+  "canceladas": [{"numero":"PI-2026-0117","motivo":"Projeto substituído por adequação normativa de descarte."}],
+  "reconhecidas": {"trimestre": [], "semestre": []}
+}

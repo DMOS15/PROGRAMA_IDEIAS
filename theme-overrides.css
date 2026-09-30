@@ -1,0 +1,20 @@
+:root{--focus:#2A5962;--direction:#6B7C43;--ambition:#A04830;--freedom:#CC9D2D;--possibility:#849FA4;--flat-white:#FCF9F4;--crema:#F7EEDC;--latte:#D3BA91;--mocha:#8C7454;--doppio:#3F3A31}
+body{background:var(--flat-white);color:var(--doppio)}
+.topbar{background:var(--focus);border-bottom-color:var(--focus)}
+.brand,.nav-link,.admin-link{color:var(--flat-white)}
+.brand-mark{background:var(--freedom);color:var(--doppio)}
+.nav-link:hover,.nav-link.active{color:var(--crema);border-color:var(--freedom)}
+.admin-link:hover,.admin-link.active{color:var(--crema)}
+.search-box:focus-within,.search-box:hover,.person-card:hover{border-color:var(--focus)}
+.search-box,.search-panel,.person-card,.idea-card,.recognition-card,.recognition-feature,.dashboard-chart-card,.chart-card,.public-kpi,.executive-kpi,.admin-section{background:var(--white)}
+button.primary-button,.admin-action,.admin-gate button{background:var(--focus)}
+button.primary-button:hover,.admin-action:hover,.admin-gate button:hover{background:var(--doppio)}
+.outline-button{color:var(--focus);border-color:var(--focus)}
+.outline-button:hover{background:var(--focus);color:var(--flat-white)}
+.status-rascunho{background:var(--possibility);color:var(--doppio)}
+.status-em-andamento{background:var(--freedom);color:var(--doppio)}
+.status-resolvido{background:var(--direction);color:var(--flat-white)}
+.status-fechado{background:var(--focus);color:var(--flat-white)}
+.status-cancelado{background:var(--ambition);color:var(--flat-white)}
+.cancel-note{border-left-color:var(--ambition);background:var(--crema);color:var(--doppio)}
+.bar-fill,.mini-bar-fill{background:var(--focus)}
