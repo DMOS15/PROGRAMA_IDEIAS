@@ -20,14 +20,28 @@ admin$('#excel-upload').addEventListener('change', async (event) => {
     if (file.name.toLowerCase().endsWith('.json')) data = JSON.parse(await file.text());
     else {
       const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' });
-      const ideaRows = XLSX.utils.sheet_to_json(findSheet(workbook, ['tabela ideias', 'tab.ideias.total', 'ideias']) || workbook.Sheets[workbook.SheetNames[0]], { defval: '' });
+      const ideaSheetName = workbook.SheetNames.find((name) => adminNormalize(name) === 'tab.ideias.total') || workbook.SheetNames.find((name) => ['tabela ideias', 'ideias'].some((candidate) => adminNormalize(name) === candidate || adminNormalize(name).includes(candidate)));
+      if (!ideaSheetName) throw new Error('Aba TAB.IDEIAS.TOTAL não encontrada.');
+      const ideaSheet = workbook.Sheets[ideaSheetName];
+      const ideaRange = XLSX.utils.decode_range(ideaSheet['!ref']);
+      const linhasTotais = Math.max(0, ideaRange.e.r - ideaRange.s.r);
+      console.log('Linhas na aba:', linhasTotais);
+      console.log('[Importação] Aba de ideias:', ideaSheetName, 'Range:', ideaSheet['!ref']);
+      const ideaRows = XLSX.utils.sheet_to_json(ideaSheet, { defval: '', range: ideaRange });
+      console.log('Após sheet_to_json:', ideaRows.length);
       const cancelSheet = findSheet(workbook, ['canceladas', 'ideias canceladas', 'tab.cancelada']);
       const cadastroSheet = findSheet(workbook, ['cadastro']);
       const dmosSheet = findSheet(workbook, ['base dmos', 'tab.colab']);
       const cancelRows = cancelSheet ? XLSX.utils.sheet_to_json(cancelSheet, { defval: '' }) : [];
       const peopleRows = cadastroSheet ? XLSX.utils.sheet_to_json(cadastroSheet, { defval: '' }) : [];
       const dmosRows = dmosSheet ? XLSX.utils.sheet_to_json(dmosSheet, { defval: '' }) : [];
-      data = { metadata: { updatedAt: new Date().toISOString(), version: '1.0.0', updateReason: 'Upload via administração', updatedBy: 'Administração' }, cadastro: peopleRows.filter((row) => adminNormalize(valueOf(row, ['STATUS', 'Status'])) === 'ativo').map((row) => ({ nome: valueOf(row, ['NOME', 'Nome']), turno: valueOf(row, ['TURNO', 'Turno']), turnoComp: valueOf(row, ['TURNO COMP']), coordenador: valueOf(row, ['COORDENADOR', 'Coordenador']), funcao: valueOf(row, ['FUNÇÃO', 'Função']), status: valueOf(row, ['STATUS', 'Status']), area: valueOf(row, ['ÁREA', 'Área']) })), baseDmos: dmosRows.map((row) => ({ baseDmos: valueOf(row, ['Base DMOS']), nome: valueOf(row, ['NOME', 'Nome']), tipo: valueOf(row, ['TIPO', 'Tipo']), cargo: valueOf(row, ['CARGO', 'Cargo']), area: valueOf(row, ['AREA', 'Área']), coordenador: valueOf(row, ['COORDENADOR', 'Coordenador']) })), ideias: ideaRows.map((row) => ({ numero: valueOf(row, ['Número', 'Numero']), descricaoCurta: valueOf(row, ['Descrição curta']), descricao: valueOf(row, ['Descrição', 'Descrição da dúvida']), status: valueOf(row, ['Status']), enviadoPor: valueOf(row, ['Enviado por']), categoria: valueOf(row, ['Categoria']), subcategoria: valueOf(row, ['Sub categoria']), criada: valueOf(row, ['Criada']), areaTrabalho: valueOf(row, ['Área de trabalho']), atualizado: valueOf(row, ['Atualizado']), atribuidoA: valueOf(row, ['Atribuído a', 'Atribuído']), grupoAtribuicao: valueOf(row, ['Grupo de atribuição']), fechado: valueOf(row, ['Fechado']), grupo: valueOf(row, ['Grupo']), autor: valueOf(row, ['Enviado por']) })), canceladas: cancelRows.map((row) => ({ numero: valueOf(row, ['Número', 'Numero']), motivo: valueOf(row, ['Descrição curta', 'Descrição', 'Motivo do cancelamento']) })).filter((row) => row.numero), reconhecidas: { trimestre: [], semestre: [] } };
+      const ideiasTratadas = ideaRows.map((row) => ({ numero: valueOf(row, ['Número', 'Numero']), descricaoCurta: valueOf(row, ['Descrição curta']), descricao: valueOf(row, ['Descrição', 'Descrição da dúvida']), status: valueOf(row, ['Status']), enviadoPor: valueOf(row, ['Enviado por']), categoria: valueOf(row, ['Categoria']), subcategoria: valueOf(row, ['Sub categoria']), criada: valueOf(row, ['Criada']), areaTrabalho: valueOf(row, ['Área de trabalho']), atualizado: valueOf(row, ['Atualizado']), atribuidoA: valueOf(row, ['Atribuído a', 'Atribuído']), grupoAtribuicao: valueOf(row, ['Grupo de atribuição']), fechado: valueOf(row, ['Fechado']), grupo: valueOf(row, ['Grupo']), autor: valueOf(row, ['Enviado por']) }));
+      console.log('Após tratamento:', ideiasTratadas.length);
+      const ideiasFiltradas = ideiasTratadas;
+      console.log('Após filtros:', ideiasFiltradas.length);
+      console.log('[Importação] Primeiros 10 números importados:', ideiasFiltradas.slice(0, 10).map((idea) => idea.numero));
+      console.log('[Importação] Últimos 10 números importados:', ideiasFiltradas.slice(-10).map((idea) => idea.numero));
+      data = { metadata: { updatedAt: new Date().toISOString(), version: '1.0.0', updateReason: 'Upload via administração', updatedBy: 'Administração' }, cadastro: peopleRows.filter((row) => adminNormalize(valueOf(row, ['STATUS', 'Status'])) === 'ativo').map((row) => ({ nome: valueOf(row, ['NOME', 'Nome']), turno: valueOf(row, ['TURNO', 'Turno']), turnoComp: valueOf(row, ['TURNO COMP']), coordenador: valueOf(row, ['COORDENADOR', 'Coordenador']), funcao: valueOf(row, ['FUNÇÃO', 'Função']), status: valueOf(row, ['STATUS', 'Status']), area: valueOf(row, ['ÁREA', 'Área']) })), baseDmos: dmosRows.map((row) => ({ baseDmos: valueOf(row, ['Base DMOS']), nome: valueOf(row, ['NOME', 'Nome']), tipo: valueOf(row, ['TIPO', 'Tipo']), cargo: valueOf(row, ['CARGO', 'Cargo']), area: valueOf(row, ['AREA', 'Área']), coordenador: valueOf(row, ['COORDENADOR', 'Coordenador']) })), ideias: ideiasFiltradas, canceladas: cancelRows.map((row) => ({ numero: valueOf(row, ['Número', 'Numero']), motivo: valueOf(row, ['Descrição curta', 'Descrição', 'Motivo do cancelamento']) })).filter((row) => row.numero), reconhecidas: { trimestre: [], semestre: [] } };
     }
     localStorage.setItem('programaIdeiasData', JSON.stringify(data));
     const cadastroAreas = uniqueAreas((data.cadastro || []).map((person) => person.area));
