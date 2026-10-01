@@ -11,6 +11,34 @@ function resolveIdeaPerson(idea, data, activePeople) {
   return { cadastroPerson, dmosMatches };
 }
 const emptyData = () => ({ metadata: {}, cadastro: [], baseDmos: [], ideias: [], canceladas: [], reconhecidas: { trimestre: [], semestre: [] } });
+const historyStorageKey = 'portalHistoricoAtualizacoes';
+const escapeHistoryCell = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+function loadUpdateHistory() {
+  try {
+    const history = JSON.parse(localStorage.getItem(historyStorageKey) || '[]');
+    return Array.isArray(history) ? history : [];
+  } catch (error) {
+    console.warn('[Histórico] Dados locais inválidos; iniciando sem registros salvos.', error);
+    return [];
+  }
+}
+function renderUpdateHistory() {
+  const body = admin$('#history-body');
+  const history = loadUpdateHistory();
+  if (!body || !history.length) return;
+  body.innerHTML = history.map((entry) => {
+    const date = new Date(entry.timestamp);
+    const dateLabel = Number.isNaN(date.getTime()) ? '' : date.toLocaleString('pt-BR');
+    return `<tr><td>${escapeHistoryCell(dateLabel)}</td><td>${escapeHistoryCell(entry.file)}</td><td>${escapeHistoryCell(entry.reason)}</td><td>${escapeHistoryCell(entry.ideas)}</td><td>${escapeHistoryCell(entry.collaborators)}</td><td>${escapeHistoryCell(entry.areas)}</td></tr>`;
+  }).join('');
+}
+function saveUpdateHistory(entry) {
+  const history = loadUpdateHistory();
+  history.unshift(entry);
+  localStorage.setItem(historyStorageKey, JSON.stringify(history.slice(0, 100)));
+  renderUpdateHistory();
+}
+renderUpdateHistory();
 
 admin$('#admin-pin-form').addEventListener('submit', (event) => { event.preventDefault(); if (admin$('#admin-pin').value === 'JDEPIU') { admin$('#admin-gate').style.display = 'none'; admin$('#admin-panel').style.display = 'block'; } else admin$('#admin-error').textContent = 'PIN incorreto. Tente novamente.'; });
 admin$('#excel-upload').addEventListener('change', async (event) => {
@@ -64,7 +92,7 @@ admin$('#excel-upload').addEventListener('change', async (event) => {
     console.table(unmatchedIdeas.slice(0, 20).map(({ idea, dmosMatches }) => ({ numero: idea.numero, enviadoPor: idea.enviadoPor, baseDMOS: dmosMatches.map((entry) => entry.baseDmos || '').filter(Boolean).join(' | '), nomesTAB_COLAB: dmosMatches.map((entry) => entry.nome).filter(Boolean).join(' | '), status: 'Sem correspondência' })));
     const areaCount = cadastroAreas.length || ideaAreas.length || dmosAreas.length;
     admin$('#upload-message').textContent = `Arquivo processado: ${data.ideias.length} ideias, ${data.cadastro.length} colaboradores e ${areaCount} áreas.`;
-    admin$('#history-body').insertAdjacentHTML('afterbegin', `<tr><td>${new Date().toLocaleString('pt-BR')}</td><td>${file.name}</td><td>Upload administrativo</td><td>${data.ideias.length}</td><td>${data.cadastro.length}</td><td>${areaCount}</td></tr>`);
+    saveUpdateHistory({ timestamp: new Date().toISOString(), file: file.name, reason: 'Upload administrativo', ideas: data.ideias.length, collaborators: data.cadastro.length, areas: areaCount });
   } catch (error) { admin$('#upload-message').style.color = 'var(--red)'; admin$('#upload-message').textContent = 'Não foi possível processar o arquivo. Verifique as abas e colunas.'; }
 });
 admin$('#recognition-form').addEventListener('submit', async (event) => { event.preventDefault(); const saved = JSON.parse(localStorage.getItem('programaIdeiasData') || JSON.stringify(emptyData())); saved.reconhecidas = saved.reconhecidas || { trimestre: [], semestre: [] }; const file = admin$('#recognition-photo').files[0]; const photo = file ? await new Promise((resolve) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.readAsDataURL(file); }) : ''; saved.reconhecidas[admin$('#recognition-period').value].unshift({ titulo: admin$('#recognition-title').value, autor: admin$('#recognition-author').value, area: admin$('#recognition-area').value, motivo: admin$('#recognition-reason').value, foto: photo }); localStorage.setItem('programaIdeiasData', JSON.stringify(saved)); admin$('#recognition-message').textContent = 'Reconhecimento cadastrado para publicação.'; event.target.reset(); });
