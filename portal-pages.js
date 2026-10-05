@@ -132,8 +132,10 @@ async function renderPeople() {
   await getPageData();
   pageLayout(`<div class="page-heading page-heading-compact"><div><span class="section-kicker">REDE DE IDEIAS</span><h1>Colaboradores</h1><p>Pesquise pelo nome do colaborador.</p></div><span class="heading-mark">✦</span></div><div class="page-toolbar"><div class="search-box"><span class="search-icon">⌕</span><input id="people-search" type="search" placeholder="Buscar pelo nome do colaborador" autocomplete="off"></div><span class="toolbar-count" id="people-count">Pesquise para começar</span></div><div id="people-grid" class="people-grid"></div>`, 'people');
   const draw = () => {
-    const term = pageNormalize(page$('#people-search').value);
-    const people = term ? pageState.people.filter((person) => pageNormalize(person.nome).includes(term)) : [];
+    const term = normalizedPersonName(page$('#people-search').value);
+    const people = term ? pageState.people.filter((person) => normalizedPersonName(person.nome).includes(term)) : [];
+    console.log('Campo utilizado para busca: Nome');
+    console.log('Quantidade encontrada:', people.length);
     page$('#people-count').textContent = term ? `${people.length} colaboradores encontrados` : 'Pesquise para começar';
     page$('#people-grid').innerHTML = term ? (people.length ? people.map((person) => `<a class="person-card" href="colaboradores.html?person=${encodeURIComponent(person.nome)}"><div class="person-card-top"><span class="avatar">${pageInitials(person.nome)}</span><span class="card-arrow">↗</span></div><h2>${pageEsc(person.nome)}</h2><p>${pageEsc(person.area)} · Coord. ${pageEsc(person.coordenador)} · ${pageEsc(person.funcao)}</p><div class="person-card-footer"><strong>${person.ideas.length}</strong><span>${person.ideas.length === 1 ? 'ideia registrada' : 'ideias registradas'}</span></div></a>`).join('') : '<div class="empty-search">Nenhum colaborador encontrado.</div>') : '<div class="empty-search"><span class="empty-icon">⌕</span><p>Digite o nome de um colaborador para começar.</p></div>';
   };
