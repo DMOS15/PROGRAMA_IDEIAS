@@ -18,3 +18,5 @@ button.primary-button:hover,.admin-action:hover,.admin-gate button:hover{backgro
 .status-cancelado{background:var(--ambition);color:var(--flat-white)}
 .cancel-note{border-left-color:var(--ambition);background:var(--crema);color:var(--doppio)}
 .bar-fill,.mini-bar-fill{background:var(--focus)}
+.idea-detail-fields .idea-subcategory-field strong{color:var(--focus);font-size:15px}
+.recognition-subcategory{color:var(--focus)!important;font-weight:700}
