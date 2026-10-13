@@ -1,5 +1,5 @@
 {
-  "metadata": {"updatedAt":"2026-09-08T06:40:00","version":"1.0.0","updateReason":"Carga demonstrativa inicial","updatedBy":"Administração"},
+  "metadata": {"updatedAt":"2026-09-08T06:40:00","version":"1.0.0","recordCount":9,"uploadedBy":"Administração","sourceFile":"ideias.json","updateReason":"Carga demonstrativa inicial","updatedBy":"Administração"},
   "cadastro": [
     {"nome":"Marina Alves","turno":"A","coordenador":"Carlos Mendes","funcao":"Operadora de Produção","status":"ATIVO","area":"Montagem","idfxo":"FX-1042"},
     {"nome":"Rafael Souza","turno":"B","coordenador":"Carlos Mendes","funcao":"Técnico de Processos","status":"ATIVO","area":"Qualidade","idfxo":"FX-1187"},

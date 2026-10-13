@@ -35,24 +35,34 @@ function samePerson(left, right) { const normalizedLeft = normalizedPersonName(l
 function emptyPersonIdeas(person) { console.warn('[Colaboradores] Nenhuma ideia encontrada para este colaborador.', person.nome); return '<div class="empty-search">Nenhuma ideia encontrada para este colaborador.</div>'; }
 
 async function getPortalData() {
-  const stored = localStorage.getItem('programaIdeiasData');
-  if (stored) {
-    try {
-      const data = JSON.parse(stored);
-      console.info('Origem dos dados carregada: localStorage');
-      return data;
-    } catch (error) { console.warn('Os dados locais estão inválidos; tentando dados/ideias.json.', error); }
-  }
+  const isUsable = (data) => {
+    const ideas = Array.isArray(data?.ideias) ? data.ideias.filter((idea) => idea && String(idea.numero ?? '').trim()) : [];
+    const collaborators = Array.isArray(data?.cadastro) ? data.cadastro.filter((person) => person && pageNormalize(person.status) === 'ativo' && String(person.nome || '').trim()) : [];
+    const areas = new Set(collaborators.map((person) => pageNormalize(person.area)).filter(Boolean));
+    if (!areas.size) ideas.forEach((idea) => { const area = pageNormalize(idea.areaTrabalho || idea.grupo); if (area) areas.add(area); });
+    if (!areas.size) (Array.isArray(data?.baseDmos) ? data.baseDmos : []).forEach((person) => { const area = pageNormalize(person.area); if (area) areas.add(area); });
+    return ideas.length > 0 && collaborators.length > 0 && areas.size > 0;
+  };
   try {
     const response = await fetch('dados/ideias.json', { cache: 'no-store' });
     if (!response.ok) throw new Error(`Falha ao carregar dados/ideias.json: ${response.status}`);
     const data = await response.json();
-    console.info('Origem dos dados carregada: ideias.json');
-    return data;
-  } catch (error) {
-    console.error('Não foi possível carregar os dados locais nem dados/ideias.json.', error);
-    return PORTAL_FALLBACK;
-  }
+    if (isUsable(data)) {
+      console.info('Origem dos dados carregada: dados/ideias.json');
+      return data;
+    }
+    console.error('dados/ideias.json não passou na validação; tentando LocalStorage.');
+  } catch (error) { console.warn('Não foi possível carregar dados/ideias.json; tentando LocalStorage.', error); }
+  try {
+    const stored = localStorage.getItem('programaIdeiasData');
+    const data = stored ? JSON.parse(stored) : null;
+    if (isUsable(data)) {
+      console.info('Origem dos dados carregada: localStorage (fallback)');
+      return data;
+    }
+  } catch (error) { console.warn('Os dados locais estão inválidos ou indisponíveis.', error); }
+  console.error('Não foi possível carregar uma base de dados válida.');
+  return PORTAL_FALLBACK;
 }
 
 async function getPageData() {
@@ -102,9 +112,9 @@ window.addEventListener('storage', (event) => {
   if (event.key === 'programaIdeiasData') location.reload();
 });
 function pageHeader(active) { return `<header class="topbar"><a class="brand" href="colaboradores.html" aria-label="Ir para colaboradores"><span class="brand-mark">+</span><span>Programa de<br><strong>Ideias</strong></span></a><nav class="topnav" aria-label="Navegação principal"><a class="nav-link ${active === 'people' ? 'active' : ''}" href="colaboradores.html">Colaboradores</a><a class="nav-link ${active === 'recognition' ? 'active' : ''}" href="reconhecimento.html">Reconhecimento</a><a class="nav-link ${active === 'coordinators' ? 'active' : ''}" href="coordenadores.html">Líderes</a></nav><a class="admin-link ${active === 'admin' ? 'active' : ''}" href="admin.html"><span class="lock-icon">▣</span> Administração</a></header>`; }
-function pageFooter(active) { const update = pageState.metadata.updatedAt ? new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(pageState.metadata.updatedAt)) : 'Não informado'; const totals = active === 'people' ? '' : `<span><strong>${pageState.ideas.length}</strong> ideias carregadas · <strong>${pageState.people.length}</strong> colaboradores ativos</span>`; return `<footer class="site-footer"><span><span class="footer-dot"></span> Última atualização: <strong>${update}</strong></span>${totals}<span>v1.0.0</span></footer>`; }
+function pageFooter() { const updatedAt = pageState.metadata.updatedAt ? new Date(pageState.metadata.updatedAt) : null; const update = updatedAt && !Number.isNaN(updatedAt.getTime()) ? new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium', timeStyle: 'short' }).format(updatedAt) : 'Não informado'; const version = pageState.metadata.version || 'Não informada'; return `<footer class="site-footer"><span><span class="footer-dot"></span> Última atualização: <strong>${pageEsc(update)}</strong></span><span><strong>${pageState.ideas.length}</strong> ideias carregadas · <strong>${pageState.people.length}</strong> colaboradores ativos</span><span>Versão da carga: <strong>${pageEsc(version)}</strong></span></footer>`; }
 function pageLayout(content, active) {
-  document.body.innerHTML = `${pageHeader(active)}<main class="site-main page-main">${content}</main>${pageFooter(active)}`;
+  document.body.innerHTML = `${pageHeader(active)}<main class="site-main page-main">${content}</main>${pageFooter()}`;
   if (active !== 'recognition') return;
   const recognitions = [...(pageState.recognitions.trimestre || []), ...(pageState.recognitions.semestre || [])];
   document.querySelectorAll('.recognition-feature').forEach((card) => {

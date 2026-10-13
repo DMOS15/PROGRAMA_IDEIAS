@@ -33,7 +33,114 @@ function resolveIdeaPerson(idea, data, activePeople) {
 }
 const emptyData = () => ({ metadata: {}, cadastro: [], baseDmos: [], ideias: [], canceladas: [], reconhecidas: { trimestre: [], semestre: [] } });
 const historyStorageKey = 'portalHistoricoAtualizacoes';
+const dataStorageKey = 'programaIdeiasData';
+const backupStorageKey = 'programaIdeiasDataBackup';
 const escapeHistoryCell = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+const datasetMetrics = (data) => {
+  const ideas = Array.isArray(data?.ideias) ? data.ideias.filter((idea) => idea && typeof idea === 'object' && ideaNumberKey(idea.numero)) : [];
+  const collaborators = Array.isArray(data?.cadastro) ? data.cadastro.filter((person) => person && typeof person === 'object' && adminNormalize(person.status) === 'ativo' && String(person.nome || '').trim()) : [];
+  const areas = uniqueAreas(collaborators.map((person) => person.area)).length || uniqueAreas(ideas.map((idea) => idea.areaTrabalho || idea.grupo)).length || uniqueAreas((data?.baseDmos || []).map((person) => person.area)).length;
+  const cancelled = Array.isArray(data?.canceladas) ? data.canceladas.filter((entry) => entry && ideaNumberKey(entry.numero)).length : ideas.filter((idea) => adminNormalize(idea.status) === 'cancelado').length;
+  return { ideas: ideas.length, collaborators: collaborators.length, areas, cancelled, subcategories: uniqueAreas(ideas.map((idea) => idea.subcategoria)).length };
+};
+const validDataset = (data) => {
+  const metrics = datasetMetrics(data);
+  return metrics.ideas > 0 && metrics.collaborators > 0 && metrics.areas > 0;
+};
+const readStoredData = (key) => {
+  try { const value = JSON.parse(localStorage.getItem(key) || 'null'); return validDataset(value) ? value : null; }
+  catch (error) { console.warn(`[Administração] Dados inválidos em ${key}.`, error); return null; }
+};
+async function loadPublishedData() {
+  try {
+    const response = await fetch('dados/ideias.json', { cache: 'no-store' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    if (validDataset(data)) return { data, source: 'JSON' };
+  } catch (error) { console.info('[Administração] JSON publicado indisponível; verificando LocalStorage.', error); }
+  const stored = readStoredData(dataStorageKey);
+  return stored ? { data: stored, source: 'LocalStorage' } : { data: null, source: 'Indisponível' };
+}
+function nextDataVersion(value) {
+  const match = String(value || '').match(/^(\d+)\.(\d+)\.(\d+)$/);
+  return match ? `${match[1]}.${match[2]}.${Number(match[3]) + 1}` : '1.0.0';
+}
+function compareDataVersions(left, right) {
+  const parts = (value) => String(value || '').split('.').map((part) => Number(part) || 0);
+  const leftParts = parts(left);
+  const rightParts = parts(right);
+  for (let index = 0; index < 3; index += 1) if ((leftParts[index] || 0) !== (rightParts[index] || 0)) return (leftParts[index] || 0) - (rightParts[index] || 0);
+  return 0;
+}
+async function loadAdminCurrentData() {
+  const published = await loadPublishedData();
+  const local = readStoredData(dataStorageKey);
+  if (local && (!published.data || compareDataVersions(local.metadata?.version, published.data.metadata?.version) > 0)) return { data: local, source: 'LocalStorage' };
+  return published;
+}
+function downloadDataset(data) {
+  const blob = new Blob([`${JSON.stringify(data, null, 2)}\n`], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'ideias.json';
+  link.style.display = 'none';
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function setupAdminReliabilityUI() {
+  const guidance = admin$('#admin-panel > p');
+  if (guidance) guidance.textContent = 'O portal público prioriza dados/ideias.json. Após cada atualização, baixe esse JSON e publique-o no repositório; o LocalStorage é uma recuperação apenas deste navegador.';
+  const uploadBox = admin$('.upload-box');
+  if (!uploadBox) return;
+  const metadataFields = document.createElement('div');
+  metadataFields.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:18px;text-align:left';
+  metadataFields.innerHTML = '<label>Responsável pela carga<input id="upload-responsible" type="text" value="Administração" autocomplete="name"></label><label>Justificativa<input id="upload-reason" type="text" value="Atualização da base de ideias" maxlength="240"></label>';
+  uploadBox.append(metadataFields);
+  const actions = document.createElement('div');
+  actions.style.cssText = 'display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;justify-content:center';
+  actions.innerHTML = '<button type="button" class="admin-action" id="download-data">Baixar JSON para publicação</button><button type="button" class="admin-action" id="restore-data" hidden>Restaurar última base válida</button>';
+  uploadBox.append(actions);
+  const historySection = [...document.querySelectorAll('.admin-section')].find((section) => section.querySelector('#history-body'));
+  if (historySection) {
+    const diagnostic = document.createElement('section');
+    diagnostic.className = 'admin-section';
+    diagnostic.innerHTML = '<h2>Diagnóstico</h2><div id="data-diagnostic" role="status">Carregando estado das bases...</div>';
+    historySection.before(diagnostic);
+    const header = historySection.querySelector('thead tr');
+    if (header && ![...header.cells].some((cell) => cell.textContent.trim() === 'Responsável')) {
+      const cell = document.createElement('th');
+      cell.textContent = 'Responsável';
+      header.append(cell);
+    }
+  }
+  admin$('#download-data').addEventListener('click', async () => {
+    const data = readStoredData(dataStorageKey) || (await loadPublishedData()).data;
+    if (!data) { admin$('#upload-message').textContent = 'Não existe uma base válida para exportar.'; return; }
+    downloadDataset(data);
+  });
+  admin$('#restore-data').addEventListener('click', () => {
+    const backup = readStoredData(backupStorageKey);
+    if (!backup) { admin$('#upload-message').textContent = 'Nenhuma base válida de recuperação foi encontrada.'; return; }
+    localStorage.setItem(dataStorageKey, JSON.stringify(backup));
+    admin$('#upload-message').textContent = `Base ${backup.metadata?.version || ''} restaurada no LocalStorage. Baixe o JSON para publicá-la.`;
+    refreshDataDiagnostic();
+  });
+}
+async function refreshDataDiagnostic() {
+  const target = admin$('#data-diagnostic');
+  if (!target) return;
+  const published = await loadPublishedData();
+  const local = readStoredData(dataStorageKey);
+  const backup = readStoredData(backupStorageKey);
+  const data = published.data;
+  const metrics = data ? datasetMetrics(data) : { ideas: 0, collaborators: 0, areas: 0 };
+  target.innerHTML = `<dl style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin:16px 0 0"><div><dt>Origem dos dados</dt><dd>${escapeHistoryCell(published.source)}</dd></div><div><dt>LocalStorage</dt><dd>${local ? 'Base válida disponível' : 'Sem base válida'}</dd></div><div><dt>JSON</dt><dd>${published.source === 'JSON' ? 'Base válida disponível' : 'Indisponível ou inválido'}</dd></div><div><dt>Quantidade de ideias</dt><dd>${metrics.ideas}</dd></div><div><dt>Quantidade de colaboradores</dt><dd>${metrics.collaborators}</dd></div><div><dt>Quantidade de áreas</dt><dd>${metrics.areas}</dd></div><div><dt>Versão dos dados</dt><dd>${escapeHistoryCell(data?.metadata?.version || 'Não informada')}</dd></div><div><dt>Última atualização</dt><dd>${escapeHistoryCell(data?.metadata?.updatedAt ? new Date(data.metadata.updatedAt).toLocaleString('pt-BR') : 'Não informada')}</dd></div><div><dt>Backup válido</dt><dd>${backup ? escapeHistoryCell(backup.metadata?.version || 'Disponível') : 'Não disponível'}</dd></div></dl>`;
+  const restoreButton = admin$('#restore-data');
+  if (restoreButton) restoreButton.hidden = !backup;
+}
 function loadUpdateHistory() {
   try {
     const history = JSON.parse(localStorage.getItem(historyStorageKey) || '[]');
@@ -46,26 +153,44 @@ function loadUpdateHistory() {
 function renderUpdateHistory() {
   const body = admin$('#history-body');
   const history = loadUpdateHistory();
-  if (!body || !history.length) return;
+  if (!body) return;
+  if (!history.length) { body.innerHTML = '<tr><td colspan="7">Nenhuma atualização registrada neste navegador.</td></tr>'; return; }
   body.innerHTML = history.map((entry) => {
     const date = new Date(entry.timestamp);
     const dateLabel = Number.isNaN(date.getTime()) ? '' : date.toLocaleString('pt-BR');
-    return `<tr><td>${escapeHistoryCell(dateLabel)}</td><td>${escapeHistoryCell(entry.file)}</td><td>${escapeHistoryCell(entry.reason)}</td><td>${escapeHistoryCell(entry.ideas)}</td><td>${escapeHistoryCell(entry.collaborators)}</td><td>${escapeHistoryCell(entry.areas)}</td></tr>`;
+    return `<tr><td>${escapeHistoryCell(dateLabel)}</td><td>${escapeHistoryCell(entry.file)}</td><td>${escapeHistoryCell(entry.reason)}</td><td>${escapeHistoryCell(entry.ideas)}</td><td>${escapeHistoryCell(entry.collaborators)}</td><td>${escapeHistoryCell(entry.areas)}</td><td>${escapeHistoryCell(entry.responsible)}</td></tr>`;
   }).join('');
 }
 function saveUpdateHistory(entry) {
   const history = loadUpdateHistory();
   history.unshift(entry);
-  localStorage.setItem(historyStorageKey, JSON.stringify(history.slice(0, 100)));
+  localStorage.setItem(historyStorageKey, JSON.stringify(history));
   renderUpdateHistory();
 }
-function addRecognitionSubcategoryField() {
+function commitValidatedUpload(data, previous, historyEntry) {
+  const previousData = localStorage.getItem(dataStorageKey);
+  const previousBackup = localStorage.getItem(backupStorageKey);
+  const previousHistory = localStorage.getItem(historyStorageKey);
+  try {
+    if (previous && validDataset(previous)) localStorage.setItem(backupStorageKey, JSON.stringify(previous));
+    localStorage.setItem(dataStorageKey, JSON.stringify(data));
+    saveUpdateHistory(historyEntry);
+  } catch (error) {
+    const restore = (key, value) => value === null ? localStorage.removeItem(key) : localStorage.setItem(key, value);
+    try {
+      restore(dataStorageKey, previousData);
+      restore(backupStorageKey, previousBackup);
+      restore(historyStorageKey, previousHistory);
+      renderUpdateHistory();
+    } catch (restoreError) { console.error('[Administração] Falha ao restaurar o estado anterior do LocalStorage.', restoreError); }
+    throw error;
+  }
+}
+async function addRecognitionSubcategoryField() {
   const form = admin$('#recognition-form');
   const photo = admin$('#recognition-photo');
   if (!form || !photo) return;
-  let ideas = [];
-  try { ideas = JSON.parse(localStorage.getItem('programaIdeiasData') || '{}').ideias || []; }
-  catch (error) { console.warn('[Reconhecimento] Não foi possível carregar subcategorias salvas.', error); }
+  const ideas = (await loadPublishedData()).data?.ideias || [];
   const options = [...new Set(ideas.map((idea) => String(idea.subcategoria || '').trim()).filter(Boolean))].sort((left, right) => left.localeCompare(right, 'pt-BR'));
   const label = document.createElement('label');
   label.textContent = 'Subcategoria';
@@ -82,9 +207,11 @@ function addRecognitionSubcategoryField() {
   photo.closest('label')?.before(label);
 }
 addRecognitionSubcategoryField();
+setupAdminReliabilityUI();
 renderUpdateHistory();
+refreshDataDiagnostic();
 
-admin$('#admin-pin-form').addEventListener('submit', (event) => { event.preventDefault(); if (admin$('#admin-pin').value === 'JDEPIU') { admin$('#admin-gate').style.display = 'none'; admin$('#admin-panel').style.display = 'block'; } else admin$('#admin-error').textContent = 'PIN incorreto. Tente novamente.'; });
+admin$('#admin-pin-form').addEventListener('submit', (event) => { event.preventDefault(); if (admin$('#admin-pin').value === 'JDEPIU') { admin$('#admin-gate').style.display = 'none'; admin$('#admin-panel').style.display = 'block'; refreshDataDiagnostic(); } else admin$('#admin-error').textContent = 'PIN incorreto. Tente novamente.'; });
 admin$('#excel-upload').addEventListener('change', async (event) => {
   const file = event.target.files[0]; if (!file) return;
   try {
@@ -108,11 +235,15 @@ admin$('#excel-upload').addEventListener('change', async (event) => {
       const ideiasPrincipais = ideaRows.map((row) => ({ numero: valueOf(row, ['Número', 'Numero']), descricaoCurta: valueOf(row, ['Descrição curta']), descricao: valueOf(row, ['Descrição', 'Descrição da dúvida']), status: valueOf(row, ['Status']), enviadoPor: valueOf(row, ['Enviado por']), subcategoria: valueOf(row, ['Subcategoria', 'Sub categoria']), criada: valueOf(row, ['Criada']), areaTrabalho: valueOf(row, ['Área de trabalho']), atualizado: valueOf(row, ['Atualizado']), atribuidoA: valueOf(row, ['Atribuído a', 'Atribuído']), grupoAtribuicao: valueOf(row, ['Grupo de atribuição']), fechado: valueOf(row, ['Fechado']), grupo: valueOf(row, ['Grupo']), autor: valueOf(row, ['Enviado por']) })).filter((idea) => ideaNumberKey(idea.numero));
       data = { metadata: { updatedAt: new Date().toISOString(), version: '1.0.0', updateReason: 'Upload via administração', updatedBy: 'Administração' }, cadastro: peopleRows.filter((row) => adminNormalize(valueOf(row, ['STATUS', 'Status'])) === 'ativo').map((row) => ({ nome: valueOf(row, ['NOME', 'Nome']), turno: valueOf(row, ['TURNO', 'Turno']), turnoComp: valueOf(row, ['TURNO COMP']), coordenador: valueOf(row, ['COORDENADOR', 'Coordenador']), funcao: valueOf(row, ['FUNÇÃO', 'Função']), status: valueOf(row, ['STATUS', 'Status']), area: valueOf(row, ['ÁREA', 'Área']) })), baseDmos: dmosRows.map((row) => ({ baseDmos: valueOf(row, ['Base DMOS']), nome: valueOf(row, ['NOME', 'Nome']), tipo: valueOf(row, ['TIPO', 'Tipo']), cargo: valueOf(row, ['CARGO', 'Cargo']), area: valueOf(row, ['AREA', 'Área']), coordenador: valueOf(row, ['COORDENADOR', 'Coordenador']) })), ideias: ideiasPrincipais, canceladas: cancelRows.map((row) => ({ numero: valueOf(row, ['Número', 'Numero']), motivo: valueOf(row, ['Descrição curta', 'Descrição', 'Motivo do cancelamento']) })).filter((row) => ideaNumberKey(row.numero)), reconhecidas: { trimestre: [], semestre: [] } };
     }
+    if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('O arquivo não contém um objeto de dados válido.');
+    data.cadastro = Array.isArray(data.cadastro) ? data.cadastro : [];
+    data.baseDmos = Array.isArray(data.baseDmos) ? data.baseDmos : [];
     data.canceladas = Array.isArray(data.canceladas) ? data.canceladas : [];
     const ideiasOriginais = Array.isArray(data.ideias) ? data.ideias : [];
     data.ideias = consolidateIdeas(ideiasOriginais, data.canceladas);
     logIdeaStatusTotals(ideiasOriginais.length, data.canceladas.length, data.ideias);
-    localStorage.setItem('programaIdeiasData', JSON.stringify(data));
+    const current = await loadAdminCurrentData();
+    const previousMetrics = current.data ? datasetMetrics(current.data) : null;
     const cadastroAreas = uniqueAreas((data.cadastro || []).map((person) => person.area));
     const ideaAreas = uniqueAreas((data.ideias || []).map((idea) => idea.areaTrabalho || idea.grupo));
     const dmosAreas = uniqueAreas((data.baseDmos || []).map((person) => person.area));
@@ -132,8 +263,43 @@ admin$('#excel-upload').addEventListener('change', async (event) => {
     console.info('20 primeiras ideias sem correspondência:');
     console.table(unmatchedIdeas.slice(0, 20).map(({ idea, dmosMatches }) => ({ numero: idea.numero, enviadoPor: idea.enviadoPor, baseDMOS: dmosMatches.map((entry) => entry.baseDmos || '').filter(Boolean).join(' | '), nomesTAB_COLAB: dmosMatches.map((entry) => entry.nome).filter(Boolean).join(' | '), status: 'Sem correspondência' })));
     const areaCount = cadastroAreas.length || ideaAreas.length || dmosAreas.length;
-    admin$('#upload-message').textContent = `Arquivo processado: ${data.ideias.length} ideias, ${data.cadastro.length} colaboradores e ${areaCount} áreas.`;
-    saveUpdateHistory({ timestamp: new Date().toISOString(), file: file.name, reason: 'Upload administrativo', ideas: data.ideias.length, collaborators: data.cadastro.length, areas: areaCount });
-  } catch (error) { console.error('[Importação] Falha ao processar arquivo:', error); admin$('#upload-message').style.color = 'var(--red)'; admin$('#upload-message').textContent = 'Não foi possível processar o arquivo. Verifique as abas e colunas.'; }
+    const metrics = datasetMetrics(data);
+    console.info('[Validação] Ideias:', metrics.ideas, 'Colaboradores:', metrics.collaborators, 'Áreas:', metrics.areas, 'Canceladas:', metrics.cancelled, 'Subcategorias:', metrics.subcategories);
+    if (!validDataset(data)) throw new Error('Carga bloqueada: ideias, colaboradores ativos e áreas precisam ser maiores que zero.');
+    const decreases = previousMetrics && ['ideas', 'collaborators', 'areas'].some((key) => metrics[key] < previousMetrics[key]);
+    if (decreases && !window.confirm('ATENÇÃO: a nova carga possui menos registros que a anterior.\n\nDeseja substituir a base mesmo assim?')) throw new Error('Carga cancelada após alerta de redução de registros.');
+    const timestamp = new Date().toISOString();
+    const responsible = admin$('#upload-responsible').value.trim() || 'Administração';
+    const reason = admin$('#upload-reason').value.trim() || 'Atualização da base de ideias';
+    data.metadata = { ...(data.metadata && typeof data.metadata === 'object' ? data.metadata : {}), updatedAt: timestamp, version: nextDataVersion(current.data?.metadata?.version), recordCount: metrics.ideas, uploadedBy: responsible, sourceFile: file.name, updateReason: reason };
+    const historyEntry = { timestamp, file: file.name, reason, responsible, ideas: metrics.ideas, collaborators: metrics.collaborators, areas: metrics.areas };
+    commitValidatedUpload(data, current.data, historyEntry);
+    admin$('#upload-message').style.color = '';
+    admin$('#upload-message').textContent = `Carga ${data.metadata.version} validada: ${metrics.ideas} ideias, ${metrics.collaborators} colaboradores, ${metrics.areas} áreas, ${metrics.cancelled} canceladas e ${metrics.subcategories} subcategorias. Baixe o JSON para publicá-lo para todos.`;
+    refreshDataDiagnostic();
+  } catch (error) { console.error('[Importação] Falha ao processar arquivo:', error); admin$('#upload-message').style.color = 'var(--red)'; admin$('#upload-message').textContent = `Não foi possível concluir a carga. ${error.message} A última base válida foi mantida.`; }
 });
-admin$('#recognition-form').addEventListener('submit', async (event) => { event.preventDefault(); const saved = JSON.parse(localStorage.getItem('programaIdeiasData') || JSON.stringify(emptyData())); saved.reconhecidas = saved.reconhecidas || { trimestre: [], semestre: [] }; const file = admin$('#recognition-photo').files[0]; const photo = file ? await new Promise((resolve) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.readAsDataURL(file); }) : ''; saved.reconhecidas[admin$('#recognition-period').value].unshift({ titulo: admin$('#recognition-title').value, autor: admin$('#recognition-author').value, area: admin$('#recognition-area').value, subcategoria: admin$('#recognition-subcategory').value, motivo: admin$('#recognition-reason').value, foto: photo }); localStorage.setItem('programaIdeiasData', JSON.stringify(saved)); admin$('#recognition-message').textContent = 'Reconhecimento cadastrado para publicação.'; event.target.reset(); });
+admin$('#recognition-form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const message = admin$('#recognition-message');
+  try {
+    const current = await loadAdminCurrentData();
+    if (!current.data || !validDataset(current.data)) throw new Error('Carregue uma base válida antes de cadastrar reconhecimentos.');
+    const saved = { ...current.data, reconhecidas: { trimestre: [...(current.data.reconhecidas?.trimestre || [])], semestre: [...(current.data.reconhecidas?.semestre || [])] } };
+    const file = admin$('#recognition-photo').files[0];
+    const photo = file ? await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = () => reject(reader.error); reader.readAsDataURL(file); }) : '';
+    const reason = admin$('#recognition-reason').value.trim() || 'Cadastro de reconhecimento';
+    saved.reconhecidas[admin$('#recognition-period').value].unshift({ titulo: admin$('#recognition-title').value, autor: admin$('#recognition-author').value, area: admin$('#recognition-area').value, subcategoria: admin$('#recognition-subcategory').value, motivo: reason, foto: photo });
+    const timestamp = new Date().toISOString();
+    const metrics = datasetMetrics(saved);
+    const responsible = admin$('#upload-responsible').value.trim() || 'Administração';
+    saved.metadata = { ...saved.metadata, updatedAt: timestamp, version: nextDataVersion(current.data.metadata?.version), recordCount: metrics.ideas, uploadedBy: responsible, updateReason: reason };
+    commitValidatedUpload(saved, current.data, { timestamp, file: 'Reconhecimento administrativo', reason, responsible, ideas: metrics.ideas, collaborators: metrics.collaborators, areas: metrics.areas });
+    message.textContent = 'Reconhecimento salvo. Baixe e publique o JSON para disponibilizar a atualização a todos.';
+    event.target.reset();
+    refreshDataDiagnostic();
+  } catch (error) {
+    console.error('[Reconhecimento] Falha ao salvar cadastro:', error);
+    message.textContent = `Não foi possível salvar o reconhecimento. ${error.message}`;
+  }
+});
