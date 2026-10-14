@@ -52,14 +52,16 @@ const readStoredData = (key) => {
   catch (error) { console.warn(`[Administração] Dados inválidos em ${key}.`, error); return null; }
 };
 async function loadPublishedData() {
+  let publishedData = null;
   try {
     const response = await fetch('dados/ideias.json', { cache: 'no-store' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
-    if (validDataset(data)) return { data, source: 'JSON' };
+    if (validDataset(data)) publishedData = data;
   } catch (error) { console.info('[Administração] JSON publicado indisponível; verificando LocalStorage.', error); }
   const stored = readStoredData(dataStorageKey);
-  return stored ? { data: stored, source: 'LocalStorage' } : { data: null, source: 'Indisponível' };
+  if (stored && (!publishedData || compareDataVersions(stored.metadata?.version, publishedData.metadata?.version) > 0)) return { data: stored, source: 'LocalStorage', jsonAvailable: Boolean(publishedData) };
+  return publishedData ? { data: publishedData, source: 'dados/ideias.json', jsonAvailable: true } : { data: stored, source: stored ? 'LocalStorage' : 'Indisponível', jsonAvailable: false };
 }
 function nextDataVersion(value) {
   const match = String(value || '').match(/^(\d+)\.(\d+)\.(\d+)$/);
@@ -101,8 +103,19 @@ function setupAdminReliabilityUI() {
   uploadBox.append(metadataFields);
   const actions = document.createElement('div');
   actions.style.cssText = 'display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;justify-content:center';
-  actions.innerHTML = '<button type="button" class="admin-action" id="download-data">Baixar JSON para publicação</button><button type="button" class="admin-action" id="restore-data" hidden>Restaurar última base válida</button>';
+  actions.innerHTML = '<button type="button" class="admin-action" id="download-data">Baixar ideias.json</button><button type="button" class="admin-action" id="restore-data" hidden>Restaurar última base válida</button>';
   uploadBox.append(actions);
+  const summary = document.createElement('div');
+  summary.id = 'upload-summary';
+  summary.hidden = true;
+  summary.style.cssText = 'margin-top:20px;padding:18px;border:1px solid var(--line);text-align:left';
+  uploadBox.append(summary);
+  const publishInstruction = document.createElement('p');
+  publishInstruction.id = 'publish-instruction';
+  publishInstruction.hidden = true;
+  publishInstruction.style.cssText = 'margin:14px 0 0;font-weight:700;text-align:left';
+  publishInstruction.textContent = 'Substitua o arquivo dados/ideias.json do repositório GitHub.';
+  uploadBox.append(publishInstruction);
   const historySection = [...document.querySelectorAll('.admin-section')].find((section) => section.querySelector('#history-body'));
   if (historySection) {
     const diagnostic = document.createElement('section');
@@ -117,9 +130,10 @@ function setupAdminReliabilityUI() {
     }
   }
   admin$('#download-data').addEventListener('click', async () => {
-    const data = readStoredData(dataStorageKey) || (await loadPublishedData()).data;
+    const data = (await loadAdminCurrentData()).data;
     if (!data) { admin$('#upload-message').textContent = 'Não existe uma base válida para exportar.'; return; }
     downloadDataset(data);
+    admin$('#publish-instruction').hidden = false;
   });
   admin$('#restore-data').addEventListener('click', () => {
     const backup = readStoredData(backupStorageKey);
@@ -137,7 +151,7 @@ async function refreshDataDiagnostic() {
   const backup = readStoredData(backupStorageKey);
   const data = published.data;
   const metrics = data ? datasetMetrics(data) : { ideas: 0, collaborators: 0, areas: 0 };
-  target.innerHTML = `<dl style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin:16px 0 0"><div><dt>Origem dos dados</dt><dd>${escapeHistoryCell(published.source)}</dd></div><div><dt>LocalStorage</dt><dd>${local ? 'Base válida disponível' : 'Sem base válida'}</dd></div><div><dt>JSON</dt><dd>${published.source === 'JSON' ? 'Base válida disponível' : 'Indisponível ou inválido'}</dd></div><div><dt>Quantidade de ideias</dt><dd>${metrics.ideas}</dd></div><div><dt>Quantidade de colaboradores</dt><dd>${metrics.collaborators}</dd></div><div><dt>Quantidade de áreas</dt><dd>${metrics.areas}</dd></div><div><dt>Versão dos dados</dt><dd>${escapeHistoryCell(data?.metadata?.version || 'Não informada')}</dd></div><div><dt>Última atualização</dt><dd>${escapeHistoryCell(data?.metadata?.updatedAt ? new Date(data.metadata.updatedAt).toLocaleString('pt-BR') : 'Não informada')}</dd></div><div><dt>Backup válido</dt><dd>${backup ? escapeHistoryCell(backup.metadata?.version || 'Disponível') : 'Não disponível'}</dd></div></dl>`;
+  target.innerHTML = `<dl style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin:16px 0 0"><div><dt>Fonte atual dos dados</dt><dd>${escapeHistoryCell(published.source)}</dd></div><div><dt>LocalStorage</dt><dd>${local ? `Versão ${escapeHistoryCell(local.metadata?.version || 'não informada')}` : 'Sem base válida'}</dd></div><div><dt>dados/ideias.json</dt><dd>${published.jsonAvailable ? 'Base válida disponível' : 'Indisponível ou inválido'}</dd></div><div><dt>Quantidade de ideias</dt><dd>${metrics.ideas}</dd></div><div><dt>Quantidade de colaboradores</dt><dd>${metrics.collaborators}</dd></div><div><dt>Quantidade de áreas</dt><dd>${metrics.areas}</dd></div><div><dt>Versão dos dados</dt><dd>${escapeHistoryCell(data?.metadata?.version || 'Não informada')}</dd></div><div><dt>Última atualização</dt><dd>${escapeHistoryCell(data?.metadata?.updatedAt ? new Date(data.metadata.updatedAt).toLocaleString('pt-BR') : 'Não informada')}</dd></div><div><dt>Backup válido</dt><dd>${backup ? escapeHistoryCell(backup.metadata?.version || 'Disponível') : 'Não disponível'}</dd></div></dl>`;
   const restoreButton = admin$('#restore-data');
   if (restoreButton) restoreButton.hidden = !backup;
 }
@@ -216,6 +230,7 @@ admin$('#excel-upload').addEventListener('change', async (event) => {
   const file = event.target.files[0]; if (!file) return;
   try {
     let data;
+    admin$('#upload-summary').hidden = true;
     if (file.name.toLowerCase().endsWith('.json')) data = JSON.parse(await file.text());
     else {
       const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' });
@@ -274,8 +289,12 @@ admin$('#excel-upload').addEventListener('change', async (event) => {
     data.metadata = { ...(data.metadata && typeof data.metadata === 'object' ? data.metadata : {}), updatedAt: timestamp, version: nextDataVersion(current.data?.metadata?.version), recordCount: metrics.ideas, uploadedBy: responsible, sourceFile: file.name, updateReason: reason };
     const historyEntry = { timestamp, file: file.name, reason, responsible, ideas: metrics.ideas, collaborators: metrics.collaborators, areas: metrics.areas };
     commitValidatedUpload(data, current.data, historyEntry);
+    admin$('#upload-summary').innerHTML = `<div style="display:grid;gap:12px"><div><strong>1. Arquivo processado</strong><div>${escapeHistoryCell(file.name)}</div></div><div><strong>2. Carga validada</strong><div>${metrics.ideas} ideias · ${metrics.collaborators} colaboradores · ${metrics.areas} áreas</div><small>${metrics.cancelled} canceladas · ${metrics.subcategories} subcategorias · versão ${escapeHistoryCell(data.metadata.version)}</small></div><div><strong>3. JSON completo gerado</strong><div>ideias.json</div></div><div><strong>4. Download</strong><div>O download foi iniciado automaticamente. Use “Baixar ideias.json” para baixar novamente.</div></div></div>`;
+    admin$('#upload-summary').hidden = false;
+    downloadDataset(data);
+    admin$('#publish-instruction').hidden = false;
     admin$('#upload-message').style.color = '';
-    admin$('#upload-message').textContent = `Carga ${data.metadata.version} validada: ${metrics.ideas} ideias, ${metrics.collaborators} colaboradores, ${metrics.areas} áreas, ${metrics.cancelled} canceladas e ${metrics.subcategories} subcategorias. Baixe o JSON para publicá-lo para todos.`;
+    admin$('#upload-message').textContent = `Carga ${data.metadata.version} processada e validada. O JSON completo foi baixado para publicação.`;
     refreshDataDiagnostic();
   } catch (error) { console.error('[Importação] Falha ao processar arquivo:', error); admin$('#upload-message').style.color = 'var(--red)'; admin$('#upload-message').textContent = `Não foi possível concluir a carga. ${error.message} A última base válida foi mantida.`; }
 });

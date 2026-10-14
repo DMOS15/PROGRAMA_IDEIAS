@@ -34,33 +34,42 @@ const normalizedPersonName = (value) => pageNormalize(value).replace(/[^a-z0-9]+
 function samePerson(left, right) { const normalizedLeft = normalizedPersonName(left); return Boolean(normalizedLeft) && normalizedLeft === normalizedPersonName(right); }
 function emptyPersonIdeas(person) { console.warn('[Colaboradores] Nenhuma ideia encontrada para este colaborador.', person.nome); return '<div class="empty-search">Nenhuma ideia encontrada para este colaborador.</div>'; }
 
+function isUsablePortalData(data) {
+  const ideas = Array.isArray(data?.ideias) ? data.ideias.filter((idea) => idea && String(idea.numero ?? '').trim()) : [];
+  const collaborators = Array.isArray(data?.cadastro) ? data.cadastro.filter((person) => person && pageNormalize(person.status) === 'ativo' && String(person.nome || '').trim()) : [];
+  const areas = new Set(collaborators.map((person) => pageNormalize(person.area)).filter(Boolean));
+  if (!areas.size) ideas.forEach((idea) => { const area = pageNormalize(idea.areaTrabalho || idea.grupo); if (area) areas.add(area); });
+  if (!areas.size) (Array.isArray(data?.baseDmos) ? data.baseDmos : []).forEach((person) => { const area = pageNormalize(person.area); if (area) areas.add(area); });
+  return ideas.length > 0 && collaborators.length > 0 && areas.size > 0;
+}
+function comparePortalVersions(left, right) {
+  const parts = (value) => String(value || '').split('.').map((part) => Number(part) || 0);
+  const leftParts = parts(left);
+  const rightParts = parts(right);
+  for (let index = 0; index < 3; index += 1) if ((leftParts[index] || 0) !== (rightParts[index] || 0)) return (leftParts[index] || 0) - (rightParts[index] || 0);
+  return 0;
+}
 async function getPortalData() {
-  const isUsable = (data) => {
-    const ideas = Array.isArray(data?.ideias) ? data.ideias.filter((idea) => idea && String(idea.numero ?? '').trim()) : [];
-    const collaborators = Array.isArray(data?.cadastro) ? data.cadastro.filter((person) => person && pageNormalize(person.status) === 'ativo' && String(person.nome || '').trim()) : [];
-    const areas = new Set(collaborators.map((person) => pageNormalize(person.area)).filter(Boolean));
-    if (!areas.size) ideas.forEach((idea) => { const area = pageNormalize(idea.areaTrabalho || idea.grupo); if (area) areas.add(area); });
-    if (!areas.size) (Array.isArray(data?.baseDmos) ? data.baseDmos : []).forEach((person) => { const area = pageNormalize(person.area); if (area) areas.add(area); });
-    return ideas.length > 0 && collaborators.length > 0 && areas.size > 0;
-  };
+  let jsonData = null;
   try {
     const response = await fetch('dados/ideias.json', { cache: 'no-store' });
     if (!response.ok) throw new Error(`Falha ao carregar dados/ideias.json: ${response.status}`);
     const data = await response.json();
-    if (isUsable(data)) {
-      console.info('Origem dos dados carregada: dados/ideias.json');
-      return data;
-    }
-    console.error('dados/ideias.json não passou na validação; tentando LocalStorage.');
+    if (isUsablePortalData(data)) jsonData = data;
+    else console.error('dados/ideias.json não passou na validação; verificando LocalStorage.');
   } catch (error) { console.warn('Não foi possível carregar dados/ideias.json; tentando LocalStorage.', error); }
   try {
     const stored = localStorage.getItem('programaIdeiasData');
     const data = stored ? JSON.parse(stored) : null;
-    if (isUsable(data)) {
-      console.info('Origem dos dados carregada: localStorage (fallback)');
+    if (isUsablePortalData(data) && (!jsonData || comparePortalVersions(data.metadata?.version, jsonData.metadata?.version) > 0)) {
+      console.info('Origem dos dados carregada: LocalStorage (versão mais nova)');
       return data;
     }
   } catch (error) { console.warn('Os dados locais estão inválidos ou indisponíveis.', error); }
+  if (jsonData) {
+    console.info('Origem dos dados carregada: dados/ideias.json');
+    return jsonData;
+  }
   console.error('Não foi possível carregar uma base de dados válida.');
   return PORTAL_FALLBACK;
 }
