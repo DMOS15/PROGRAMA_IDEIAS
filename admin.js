@@ -35,6 +35,9 @@ const emptyData = () => ({ metadata: {}, cadastro: [], baseDmos: [], ideias: [],
 const historyStorageKey = 'portalHistoricoAtualizacoes';
 const dataStorageKey = 'programaIdeiasData';
 const backupStorageKey = 'programaIdeiasDataBackup';
+const publicationStatusKey = 'portalPublicationStatus';
+const githubRepository = { owner: 'DMOS15', name: 'PROGRAMA_IDEIAS', branch: 'main', path: 'dados/ideias.json' };
+let activeGitHubToken = '';
 const escapeHistoryCell = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
 const datasetMetrics = (data) => {
   const ideas = Array.isArray(data?.ideias) ? data.ideias.filter((idea) => idea && typeof idea === 'object' && ideaNumberKey(idea.numero)) : [];
@@ -60,8 +63,8 @@ async function loadPublishedData() {
     if (validDataset(data)) publishedData = data;
   } catch (error) { console.info('[Administração] JSON publicado indisponível; verificando LocalStorage.', error); }
   const stored = readStoredData(dataStorageKey);
-  if (stored && (!publishedData || compareDataVersions(stored.metadata?.version, publishedData.metadata?.version) > 0)) return { data: stored, source: 'LocalStorage', jsonAvailable: Boolean(publishedData) };
-  return publishedData ? { data: publishedData, source: 'dados/ideias.json', jsonAvailable: true } : { data: stored, source: stored ? 'LocalStorage' : 'Indisponível', jsonAvailable: false };
+  if (stored && (!publishedData || compareDataVersions(stored.metadata?.version, publishedData.metadata?.version) > 0)) return { data: stored, source: 'LocalStorage', jsonAvailable: Boolean(publishedData), publishedData };
+  return publishedData ? { data: publishedData, source: 'dados/ideias.json', jsonAvailable: true, publishedData } : { data: stored, source: stored ? 'LocalStorage' : 'Indisponível', jsonAvailable: false, publishedData: null };
 }
 function nextDataVersion(value) {
   const match = String(value || '').match(/^(\d+)\.(\d+)\.(\d+)$/);
@@ -92,30 +95,135 @@ function downloadDataset(data) {
   link.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+function encodeBase64Utf8(value) {
+  const bytes = new TextEncoder().encode(value);
+  let binary = '';
+  for (let offset = 0; offset < bytes.length; offset += 0x8000) binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
+  return btoa(binary);
+}
+async function githubResponseJson(response) {
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.message || `GitHub respondeu HTTP ${response.status}.`);
+  return payload;
+}
+async function publishDatasetToGitHub(data, token) {
+  const endpoint = `https://api.github.com/repos/${githubRepository.owner}/${githubRepository.name}/contents/${githubRepository.path}`;
+  const headers = { Accept: 'application/vnd.github+json', Authorization: `Bearer ${token}`, 'X-GitHub-Api-Version': '2022-11-28' };
+  const currentResponse = await fetch(`${endpoint}?ref=${githubRepository.branch}`, { headers, cache: 'no-store' });
+  const currentFile = await githubResponseJson(currentResponse);
+  let currentData;
+  if (currentFile.content) {
+    const binary = atob(currentFile.content.replace(/\s/g, ''));
+    currentData = JSON.parse(new TextDecoder().decode(Uint8Array.from(binary, (character) => character.charCodeAt(0))));
+  } else if (currentFile.download_url) {
+    const rawResponse = await fetch(currentFile.download_url, { cache: 'no-store' });
+    if (!rawResponse.ok) throw new Error('Não foi possível validar a versão atual do JSON remoto.');
+    currentData = await rawResponse.json();
+  } else throw new Error('O GitHub não retornou o conteúdo atual de dados/ideias.json.');
+  const versionComparison = compareDataVersions(currentData.metadata?.version, data.metadata?.version);
+  if (versionComparison > 0) throw new Error(`O repositório já contém a versão ${currentData.metadata.version}, mais nova que esta carga. Recarregue os dados antes de tentar novamente.`);
+  if (versionComparison === 0) {
+    if (currentData.metadata?.updatedAt === data.metadata?.updatedAt) return { alreadyPublished: true, commitSha: null };
+    throw new Error('A versão desta carga diverge da versão remota. Recarregue o portal antes de publicar para evitar perda de dados.');
+  }
+  const updateResponse = await fetch(endpoint, {
+    method: 'PUT',
+    headers,
+    body: JSON.stringify({ message: `Atualiza dados do portal (${data.metadata.version})`, content: encodeBase64Utf8(`${JSON.stringify(data, null, 2)}\n`), sha: currentFile.sha, branch: githubRepository.branch })
+  });
+  const result = await githubResponseJson(updateResponse);
+  return { alreadyPublished: false, commitSha: result.commit?.sha || null };
+}
+function readPublicationStatus() {
+  try { return JSON.parse(localStorage.getItem(publicationStatusKey) || 'null'); }
+  catch (error) { console.warn('[Publicação] Estado de sincronização local inválido.', error); return null; }
+}
+function updatePublishButton() {
+  const button = admin$('#publish-portal');
+  if (!button) return;
+  const hasPendingData = Boolean(readStoredData(dataStorageKey));
+  button.disabled = !hasPendingData || button.dataset.publishing === 'true';
+  button.title = !hasPendingData ? 'Carregue e valide um arquivo antes de publicar.' : !activeGitHubToken ? 'Configure a credencial na área avançada para concluir a publicação.' : '';
+}
+async function renderPublicationCard(loadedData) {
+  const target = admin$('#publication-status');
+  if (!target) return;
+  const loaded = loadedData || await loadPublishedData();
+  const data = loaded.data;
+  const metrics = data ? datasetMetrics(data) : { ideas: 0, collaborators: 0, areas: 0 };
+  const sync = readPublicationStatus();
+  const isSynced = Boolean(sync?.status === 'synced' && sync.version === data?.metadata?.version);
+  const statusText = isSynced ? 'Commit enviado; aguardando GitHub Pages' : loaded.source === 'LocalStorage' ? 'Carga validada, aguardando publicação' : 'Portal publicado';
+  const updatedAt = data?.metadata?.updatedAt ? new Date(data.metadata.updatedAt) : null;
+  const updatedLabel = updatedAt && !Number.isNaN(updatedAt.getTime()) ? updatedAt.toLocaleString('pt-BR') : 'Não informada';
+  const syncedAt = sync?.syncedAt ? new Date(sync.syncedAt) : null;
+  const syncedLabel = isSynced && syncedAt && !Number.isNaN(syncedAt.getTime()) ? syncedAt.toLocaleString('pt-BR') : loaded.source === 'dados/ideias.json' ? 'Conforme JSON publicado' : 'Pendente';
+  target.innerHTML = `<dl style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:14px 0"><div><dt>Status</dt><dd>${escapeHistoryCell(statusText)}</dd></div><div><dt>Última atualização</dt><dd>${escapeHistoryCell(updatedLabel)}</dd></div><div><dt>Última sincronização</dt><dd>${escapeHistoryCell(syncedLabel)}</dd></div><div><dt>Versão</dt><dd>${escapeHistoryCell(data?.metadata?.version || 'Não informada')}</dd></div><div><dt>Quantidade de ideias</dt><dd>${metrics.ideas}</dd></div><div><dt>Quantidade de colaboradores</dt><dd>${metrics.collaborators}</dd></div><div><dt>Quantidade de áreas</dt><dd>${metrics.areas}</dd></div></dl>`;
+}
+async function publishCurrentDataset() {
+  const button = admin$('#publish-portal');
+  const message = admin$('#upload-message');
+  if (!activeGitHubToken) {
+    admin$('#advanced-publication').open = true;
+    admin$('#github-token-status').textContent = 'Conecte um token fine-grained para publicar a carga validada.';
+    admin$('#github-token').focus();
+    return;
+  }
+  button.dataset.publishing = 'true';
+  button.textContent = 'Publicando...';
+  button.disabled = true;
+  try {
+    const loaded = await loadAdminCurrentData();
+    if (!loaded.data || !validDataset(loaded.data)) throw new Error('Não há uma carga válida para publicar.');
+    const result = await publishDatasetToGitHub(loaded.data, activeGitHubToken);
+    const status = { status: 'synced', version: loaded.data.metadata?.version, syncedAt: new Date().toISOString(), commitSha: result.commitSha };
+    localStorage.setItem(publicationStatusKey, JSON.stringify(status));
+    message.style.color = '';
+    message.textContent = result.alreadyPublished ? 'Esta versão já está publicada no repositório.' : 'Atualização enviada ao GitHub. O GitHub Pages publicará a nova versão automaticamente.';
+    await refreshDataDiagnostic();
+  } catch (error) {
+    console.error('[Publicação] Falha ao atualizar o portal:', error);
+    message.style.color = 'var(--red)';
+    message.textContent = `Não foi possível atualizar o portal: ${error.message}`;
+    const status = readPublicationStatus();
+    if (status) { status.status = 'error'; localStorage.setItem(publicationStatusKey, JSON.stringify(status)); }
+    await refreshDataDiagnostic();
+  } finally {
+    button.dataset.publishing = 'false';
+    button.textContent = 'Atualizar Portal';
+    updatePublishButton();
+  }
+}
 function setupAdminReliabilityUI() {
   const guidance = admin$('#admin-panel > p');
-  if (guidance) guidance.textContent = 'O portal público prioriza dados/ideias.json. Após cada atualização, baixe esse JSON e publique-o no repositório; o LocalStorage é uma recuperação apenas deste navegador.';
+  if (guidance) guidance.textContent = 'Importe a planilha e publique uma carga validada diretamente no portal.';
+  const adminNote = admin$('.admin-footer');
+  if (adminNote) adminNote.textContent = 'A integração usa um token fine-grained do GitHub apenas nesta sessão. Restrinja-o a este repositório, conceda somente Contents: Read and write e configure expiração; o token nunca é salvo no navegador.';
   const uploadBox = admin$('.upload-box');
   if (!uploadBox) return;
-  const metadataFields = document.createElement('div');
-  metadataFields.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:18px;text-align:left';
-  metadataFields.innerHTML = '<label>Responsável pela carga<input id="upload-responsible" type="text" value="Administração" autocomplete="name"></label><label>Justificativa<input id="upload-reason" type="text" value="Atualização da base de ideias" maxlength="240"></label>';
-  uploadBox.append(metadataFields);
-  const actions = document.createElement('div');
-  actions.style.cssText = 'display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;justify-content:center';
-  actions.innerHTML = '<button type="button" class="admin-action" id="download-data">Baixar ideias.json</button><button type="button" class="admin-action" id="restore-data" hidden>Restaurar última base válida</button>';
-  uploadBox.append(actions);
+  const publishButton = document.createElement('button');
+  publishButton.type = 'button';
+  publishButton.id = 'publish-portal';
+  publishButton.className = 'admin-action';
+  publishButton.textContent = 'Atualizar Portal';
+  publishButton.disabled = true;
+  publishButton.style.cssText = 'margin-top:18px;padding:13px 22px;cursor:pointer';
   const summary = document.createElement('div');
   summary.id = 'upload-summary';
   summary.hidden = true;
   summary.style.cssText = 'margin-top:20px;padding:18px;border:1px solid var(--line);text-align:left';
   uploadBox.append(summary);
-  const publishInstruction = document.createElement('p');
-  publishInstruction.id = 'publish-instruction';
-  publishInstruction.hidden = true;
-  publishInstruction.style.cssText = 'margin:14px 0 0;font-weight:700;text-align:left';
-  publishInstruction.textContent = 'Substitua o arquivo dados/ideias.json do repositório GitHub.';
-  uploadBox.append(publishInstruction);
+  uploadBox.append(publishButton);
+  const publicationCard = document.createElement('section');
+  publicationCard.className = 'admin-section';
+  publicationCard.id = 'publication-card';
+  publicationCard.innerHTML = '<h2>Status da Publicação</h2><div id="publication-status"></div>';
+  uploadBox.closest('.admin-section')?.after(publicationCard);
+  const advanced = document.createElement('details');
+  advanced.className = 'admin-section';
+  advanced.id = 'advanced-publication';
+  advanced.innerHTML = '<summary style="cursor:pointer;font-weight:700">Configuração avançada da publicação</summary><p>Use um token fine-grained com acesso somente a Contents: Read and write neste repositório. O token é usado apenas nesta sessão e não é armazenado.</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0"><label>Responsável pela carga<input id="upload-responsible" type="text" value="Administração" autocomplete="name"></label><label>Justificativa<input id="upload-reason" type="text" value="Atualização da base de ideias" maxlength="240"></label></div><label for="github-token">Token pessoal do GitHub</label><input id="github-token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_..." style="display:block;width:min(100%,520px);margin:8px 0;padding:12px"><div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="admin-action" id="connect-github">Conectar nesta sessão</button><button type="button" class="admin-action" id="download-data">Baixar JSON (avançado)</button><button type="button" class="admin-action" id="restore-data" hidden>Restaurar última base (avançado)</button></div><small id="github-token-status" role="status"></small>';
+  publicationCard.after(advanced);
   const historySection = [...document.querySelectorAll('.admin-section')].find((section) => section.querySelector('#history-body'));
   if (historySection) {
     const diagnostic = document.createElement('section');
@@ -133,7 +241,6 @@ function setupAdminReliabilityUI() {
     const data = (await loadAdminCurrentData()).data;
     if (!data) { admin$('#upload-message').textContent = 'Não existe uma base válida para exportar.'; return; }
     downloadDataset(data);
-    admin$('#publish-instruction').hidden = false;
   });
   admin$('#restore-data').addEventListener('click', () => {
     const backup = readStoredData(backupStorageKey);
@@ -142,6 +249,15 @@ function setupAdminReliabilityUI() {
     admin$('#upload-message').textContent = `Base ${backup.metadata?.version || ''} restaurada no LocalStorage. Baixe o JSON para publicá-la.`;
     refreshDataDiagnostic();
   });
+  admin$('#connect-github').addEventListener('click', () => {
+    const field = admin$('#github-token');
+    activeGitHubToken = field.value.trim();
+    field.value = '';
+    admin$('#github-token-status').textContent = activeGitHubToken ? 'Credencial ativa somente nesta sessão.' : 'Informe um token válido.';
+    updatePublishButton();
+  });
+  publishButton.addEventListener('click', publishCurrentDataset);
+  renderPublicationCard();
 }
 async function refreshDataDiagnostic() {
   const target = admin$('#data-diagnostic');
@@ -150,8 +266,15 @@ async function refreshDataDiagnostic() {
   const local = readStoredData(dataStorageKey);
   const backup = readStoredData(backupStorageKey);
   const data = published.data;
-  const metrics = data ? datasetMetrics(data) : { ideas: 0, collaborators: 0, areas: 0 };
-  target.innerHTML = `<dl style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin:16px 0 0"><div><dt>Fonte atual dos dados</dt><dd>${escapeHistoryCell(published.source)}</dd></div><div><dt>LocalStorage</dt><dd>${local ? `Versão ${escapeHistoryCell(local.metadata?.version || 'não informada')}` : 'Sem base válida'}</dd></div><div><dt>dados/ideias.json</dt><dd>${published.jsonAvailable ? 'Base válida disponível' : 'Indisponível ou inválido'}</dd></div><div><dt>Quantidade de ideias</dt><dd>${metrics.ideas}</dd></div><div><dt>Quantidade de colaboradores</dt><dd>${metrics.collaborators}</dd></div><div><dt>Quantidade de áreas</dt><dd>${metrics.areas}</dd></div><div><dt>Versão dos dados</dt><dd>${escapeHistoryCell(data?.metadata?.version || 'Não informada')}</dd></div><div><dt>Última atualização</dt><dd>${escapeHistoryCell(data?.metadata?.updatedAt ? new Date(data.metadata.updatedAt).toLocaleString('pt-BR') : 'Não informada')}</dd></div><div><dt>Backup válido</dt><dd>${backup ? escapeHistoryCell(backup.metadata?.version || 'Disponível') : 'Não disponível'}</dd></div></dl>`;
+  const sync = readPublicationStatus();
+  const isSynced = Boolean(sync?.status === 'synced' && sync.version === data?.metadata?.version);
+  const syncedAt = sync?.syncedAt ? new Date(sync.syncedAt) : null;
+  const syncedLabel = isSynced && syncedAt && !Number.isNaN(syncedAt.getTime()) ? syncedAt.toLocaleString('pt-BR') : published.source === 'dados/ideias.json' ? 'Conforme JSON publicado' : 'Pendente';
+  const portalStatus = isSynced ? 'Commit enviado; deploy do Pages pendente' : published.source === 'dados/ideias.json' ? 'Publicado' : 'Pendente de publicação';
+  target.innerHTML = `<dl style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin:16px 0 0"><div><dt>Portal atualizado</dt><dd>${portalStatus}</dd></div><div><dt>Última sincronização</dt><dd>${escapeHistoryCell(syncedLabel)}</dd></div><div><dt>Versão</dt><dd>${escapeHistoryCell(data?.metadata?.version || 'Não informada')}</dd></div><div><dt>Fonte dos dados</dt><dd>${escapeHistoryCell(published.source)}</dd></div></dl>`;
+  if (local && (!published.publishedData || compareDataVersions(local.metadata?.version, published.publishedData.metadata?.version) > 0)) admin$('#publish-portal').disabled = !activeGitHubToken;
+  await renderPublicationCard(published);
+  updatePublishButton();
   const restoreButton = admin$('#restore-data');
   if (restoreButton) restoreButton.hidden = !backup;
 }
@@ -289,12 +412,11 @@ admin$('#excel-upload').addEventListener('change', async (event) => {
     data.metadata = { ...(data.metadata && typeof data.metadata === 'object' ? data.metadata : {}), updatedAt: timestamp, version: nextDataVersion(current.data?.metadata?.version), recordCount: metrics.ideas, uploadedBy: responsible, sourceFile: file.name, updateReason: reason };
     const historyEntry = { timestamp, file: file.name, reason, responsible, ideas: metrics.ideas, collaborators: metrics.collaborators, areas: metrics.areas };
     commitValidatedUpload(data, current.data, historyEntry);
-    admin$('#upload-summary').innerHTML = `<div style="display:grid;gap:12px"><div><strong>1. Arquivo processado</strong><div>${escapeHistoryCell(file.name)}</div></div><div><strong>2. Carga validada</strong><div>${metrics.ideas} ideias · ${metrics.collaborators} colaboradores · ${metrics.areas} áreas</div><small>${metrics.cancelled} canceladas · ${metrics.subcategories} subcategorias · versão ${escapeHistoryCell(data.metadata.version)}</small></div><div><strong>3. JSON completo gerado</strong><div>ideias.json</div></div><div><strong>4. Download</strong><div>O download foi iniciado automaticamente. Use “Baixar ideias.json” para baixar novamente.</div></div></div>`;
+    admin$('#upload-summary').innerHTML = `<div style="display:grid;gap:12px"><div><strong>Arquivo carregado e processado</strong><div>${escapeHistoryCell(file.name)}</div></div><div><strong>Carga validada</strong><div>${metrics.ideas} ideias · ${metrics.collaborators} colaboradores · ${metrics.areas} áreas</div><small>${metrics.cancelled} canceladas · ${metrics.subcategories} subcategorias · versão ${escapeHistoryCell(data.metadata.version)}</small></div><div><strong>Próxima etapa</strong><div>Revise os totais acima e clique em “Atualizar Portal”.</div></div></div>`;
     admin$('#upload-summary').hidden = false;
-    downloadDataset(data);
-    admin$('#publish-instruction').hidden = false;
     admin$('#upload-message').style.color = '';
-    admin$('#upload-message').textContent = `Carga ${data.metadata.version} processada e validada. O JSON completo foi baixado para publicação.`;
+    admin$('#upload-message').textContent = `Carga ${data.metadata.version} processada e validada. Pronta para publicação.`;
+    updatePublishButton();
     refreshDataDiagnostic();
   } catch (error) { console.error('[Importação] Falha ao processar arquivo:', error); admin$('#upload-message').style.color = 'var(--red)'; admin$('#upload-message').textContent = `Não foi possível concluir a carga. ${error.message} A última base válida foi mantida.`; }
 });
