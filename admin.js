@@ -280,7 +280,7 @@ function setupAdminReliabilityUI() {
   const diagnosticSection = [...document.querySelectorAll('.admin-section')].find((section) => section.querySelector('#data-diagnostic'));
   if (diagnosticSection) advanced.append(diagnosticSection);
   const recognitionSection = admin$('#recognition-form')?.closest('.admin-section');
-  if (recognitionSection) advanced.append(recognitionSection);
+  if (recognitionSection) advanced.before(recognitionSection);
   const footer = admin$('.admin-footer');
   if (footer) advanced.append(footer);
   admin$('#download-data').addEventListener('click', async () => {
