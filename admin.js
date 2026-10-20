@@ -35,12 +35,14 @@ const emptyData = () => ({ metadata: {}, cadastro: [], baseDmos: [], ideias: [],
 const historyStorageKey = 'portalHistoricoAtualizacoes';
 const dataStorageKey = 'programaIdeiasData';
 const backupStorageKey = 'programaIdeiasDataBackup';
+const recognitionsBackupStorageKey = 'programaIdeiasRecognitionsBackup';
 const publicationStatusKey = 'portalPublicationStatus';
 const githubTokenStorageKey = 'portalGitHubToken';
 const githubRepository = { owner: 'DMOS15', name: 'PROGRAMA_IDEIAS', branch: 'main', path: 'dados/ideias.json' };
 let activeGitHubToken = '';
 let lastPublishedAt = '';
 let recognitionEditing = null;
+let pendingAdminData = null;
 const escapeHistoryCell = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
 const datasetMetrics = (data) => {
   const ideas = Array.isArray(data?.ideias) ? data.ideias.filter((idea) => idea && typeof idea === 'object' && ideaNumberKey(idea.numero)) : [];
@@ -57,6 +59,16 @@ const readStoredData = (key) => {
   try { const value = JSON.parse(localStorage.getItem(key) || 'null'); return validDataset(value) ? value : null; }
   catch (error) { console.warn(`[Administração] Dados inválidos em ${key}.`, error); return null; }
 };
+function readRecognitionsBackup() {
+  try {
+    const data = JSON.parse(localStorage.getItem(recognitionsBackupStorageKey) || 'null');
+    if (!data || !Array.isArray(data.trimestre) || !Array.isArray(data.semestre)) return null;
+    return { trimestre: data.trimestre, semestre: data.semestre };
+  } catch (error) {
+    console.warn('[Reconhecimento] Backup específico de reconhecimentos inválido.', error);
+    return null;
+  }
+}
 async function loadPublishedData() {
   let publishedData = null;
   try {
@@ -65,8 +77,25 @@ async function loadPublishedData() {
     const data = await response.json();
     if (validDataset(data)) publishedData = data;
   } catch (error) { console.info('[Administração] JSON publicado indisponível; verificando LocalStorage.', error); }
+  const remoteData = publishedData;
   const stored = readStoredData(dataStorageKey);
-  return publishedData ? { data: publishedData, source: 'dados/ideias.json', jsonAvailable: true, publishedData } : { data: stored, source: stored ? 'LocalStorage' : 'Indisponível', jsonAvailable: false, publishedData: null };
+  const savedRecognitions = readRecognitionsBackup();
+  if (savedRecognitions) {
+    const pendingBase = stored && (!remoteData || compareDataVersions(stored.metadata?.version, remoteData.metadata?.version) > 0) ? stored : remoteData || stored;
+    if (pendingBase) {
+      publishedData = {
+        ...pendingBase,
+        metadata: {
+          ...pendingBase.metadata,
+          version: nextDataVersion(pendingBase.metadata?.version),
+          updatedAt: new Date().toISOString(),
+          updateReason: 'Alterações locais de reconhecimentos pendentes'
+        },
+        reconhecidas: savedRecognitions
+      };
+    }
+  }
+  return publishedData ? { data: publishedData, source: savedRecognitions ? 'LocalStorage' : 'dados/ideias.json', jsonAvailable: Boolean(remoteData), publishedData: remoteData } : { data: stored, source: stored ? 'LocalStorage' : 'Indisponível', jsonAvailable: false, publishedData: null };
 }
 function nextDataVersion(value) {
   const match = String(value || '').match(/^(\d+)\.(\d+)\.(\d+)$/);
@@ -80,9 +109,22 @@ function compareDataVersions(left, right) {
   return 0;
 }
 async function loadAdminCurrentData() {
+  if (pendingAdminData) return { data: pendingAdminData, source: 'LocalStorage' };
   const published = await loadPublishedData();
   const local = readStoredData(dataStorageKey);
-  if (local && (!published.data || compareDataVersions(local.metadata?.version, published.data.metadata?.version) > 0)) return { ...published, data: local, source: 'LocalStorage' };
+  if (local && (!published.data || compareDataVersions(local.metadata?.version, published.data.metadata?.version) > 0)) {
+    const savedRecognitions = readRecognitionsBackup();
+    if (!savedRecognitions) return { ...published, data: local, source: 'LocalStorage' };
+    return {
+      ...published,
+      data: {
+        ...local,
+        metadata: { ...local.metadata, version: nextDataVersion(local.metadata?.version), updatedAt: new Date().toISOString(), updateReason: 'Alterações locais de reconhecimentos pendentes' },
+        reconhecidas: savedRecognitions
+      },
+      source: 'LocalStorage'
+    };
+  }
   return published;
 }
 function downloadDataset(data) {
@@ -174,7 +216,7 @@ function renderUploadSummary(data, fileName = '') {
 function updatePublishButton() {
   const button = admin$('#publish-portal');
   if (!button) return;
-  const hasPendingData = Boolean(readStoredData(dataStorageKey));
+  const hasPendingData = Boolean(pendingAdminData || readStoredData(dataStorageKey) || readRecognitionsBackup());
   button.disabled = !hasPendingData || button.dataset.publishing === 'true';
   button.title = !hasPendingData ? 'Carregue e valide um arquivo antes de publicar.' : !activeGitHubToken ? 'Conecte um token do GitHub nas configurações avançadas para publicar.' : '';
 }
@@ -229,14 +271,19 @@ async function publishCurrentDataset() {
     if (!loaded.data || !validDataset(loaded.data)) throw new Error('Não há uma carga válida para publicar.');
     const result = await publishDatasetToGitHub(loaded.data, activeGitHubToken);
     const status = { status: 'committed', version: loaded.data.metadata?.version, syncedAt: new Date().toISOString(), commitSha: result.commitSha };
-    localStorage.setItem(publicationStatusKey, JSON.stringify(status));
+    try { localStorage.setItem(publicationStatusKey, JSON.stringify(status)); }
+    catch (error) { console.warn('[Publicação] Não foi possível salvar o status local da publicação.', error); }
     message.style.color = '';
     button.textContent = 'Verificando publicação...';
     const isPublished = await waitForGitHubPages(loaded.data);
     if (isPublished) {
       status.status = 'published';
-      localStorage.setItem(publicationStatusKey, JSON.stringify(status));
+      try { localStorage.setItem(publicationStatusKey, JSON.stringify(status)); }
+      catch (error) { console.warn('[Publicação] Não foi possível salvar o status local da publicação.', error); }
       message.textContent = result.alreadyPublished ? 'Esta versão já está publicada no GitHub Pages.' : 'Portal atualizado e confirmado no GitHub Pages.';
+      pendingAdminData = null;
+      try { localStorage.removeItem(recognitionsBackupStorageKey); }
+      catch (error) { console.warn('[Reconhecimento] Não foi possível limpar o backup local após publicação.', error); }
     } else {
       message.textContent = result.alreadyPublished ? 'O repositório já contém esta versão; o GitHub Pages ainda está propagando os dados.' : 'Commit criado no GitHub. O GitHub Pages ainda não confirmou a nova base; aguarde alguns instantes e atualize a página.';
     }
@@ -246,7 +293,11 @@ async function publishCurrentDataset() {
     message.style.color = 'var(--red)';
     message.textContent = `Não foi possível atualizar o portal: ${error.message}`;
     const status = readPublicationStatus();
-    if (status) { status.status = 'error'; localStorage.setItem(publicationStatusKey, JSON.stringify(status)); }
+    if (status) {
+      status.status = 'error';
+      try { localStorage.setItem(publicationStatusKey, JSON.stringify(status)); }
+      catch (storageError) { console.warn('[Publicação] Não foi possível salvar o estado do erro.', storageError); }
+    }
     await refreshDataDiagnostic();
   } finally {
     button.dataset.publishing = 'false';
@@ -432,7 +483,7 @@ async function refreshDataDiagnostic() {
   const target = admin$('#data-diagnostic');
   if (!target) return;
   const published = await loadPublishedData();
-  const local = readStoredData(dataStorageKey);
+  const local = pendingAdminData || readStoredData(dataStorageKey);
   const backup = readStoredData(backupStorageKey);
   const data = published.data;
   const sync = readPublicationStatus();
@@ -441,7 +492,8 @@ async function refreshDataDiagnostic() {
   const isPublished = Boolean(!localIsNewer && (sync?.status === 'published' || remoteConfirmsCommit) && sync.version === data?.metadata?.version);
   if (remoteConfirmsCommit) {
     sync.status = 'published';
-    localStorage.setItem(publicationStatusKey, JSON.stringify(sync));
+    try { localStorage.setItem(publicationStatusKey, JSON.stringify(sync)); }
+    catch (error) { console.warn('[Publicação] Não foi possível salvar o status local da publicação.', error); }
   }
   const isCommitted = Boolean(sync?.status === 'committed' && sync.version === local?.metadata?.version);
   const syncedAt = sync?.syncedAt ? new Date(sync.syncedAt) : null;
@@ -480,24 +532,35 @@ function saveUpdateHistory(entry) {
   localStorage.setItem(historyStorageKey, JSON.stringify(history));
   renderUpdateHistory();
 }
-function commitValidatedUpload(data, previous, historyEntry) {
-  const previousData = localStorage.getItem(dataStorageKey);
-  const previousBackup = localStorage.getItem(backupStorageKey);
-  const previousHistory = localStorage.getItem(historyStorageKey);
+function commitValidatedUpload(data, previous, historyEntry, { recognitionOnly = false } = {}) {
+  pendingAdminData = data;
+  const warnings = [];
   try {
-    if (previous && validDataset(previous)) localStorage.setItem(backupStorageKey, JSON.stringify(previous));
-    localStorage.setItem(dataStorageKey, JSON.stringify(data));
+    if (recognitionOnly) {
+      localStorage.removeItem(backupStorageKey);
+      localStorage.setItem(recognitionsBackupStorageKey, JSON.stringify(cloneRecognitions(data)));
+    } else if (previous && validDataset(previous)) {
+      localStorage.setItem(backupStorageKey, JSON.stringify(previous));
+    }
+  } catch (error) {
+    console.warn('[Administração] Não foi possível salvar o backup local.', error);
+    warnings.push('O armazenamento local está cheio. A alteração foi mantida nesta sessão; publique antes de fechar a página.');
+  }
+  if (!recognitionOnly) {
+    try {
+      localStorage.setItem(dataStorageKey, JSON.stringify(data));
+    } catch (error) {
+      console.warn('[Administração] Não foi possível salvar a carga completa no navegador.', error);
+      warnings.push('A alteração foi mantida nesta sessão, mas não pôde ser salva integralmente no navegador. Publique antes de fechar a página.');
+    }
+  }
+  try {
     saveUpdateHistory(historyEntry);
   } catch (error) {
-    const restore = (key, value) => value === null ? localStorage.removeItem(key) : localStorage.setItem(key, value);
-    try {
-      restore(dataStorageKey, previousData);
-      restore(backupStorageKey, previousBackup);
-      restore(historyStorageKey, previousHistory);
-      renderUpdateHistory();
-    } catch (restoreError) { console.error('[Administração] Falha ao restaurar o estado anterior do LocalStorage.', restoreError); }
-    throw error;
+    console.warn('[Histórico] Não foi possível atualizar o histórico local.', error);
+    warnings.push('O histórico local não pôde ser atualizado por falta de espaço.');
   }
+  return [...new Set(warnings)];
 }
 function cloneRecognitions(data) {
   return {
@@ -519,6 +582,8 @@ async function renderRecognitionsList(data) {
     const items = Array.isArray(recognitions[period]) ? recognitions[period] : [];
     return items.map((item, index) => ({ period, item, index }));
   });
+  const count = admin$('#recognition-count');
+  if (count) count.textContent = `${entries.length} ${entries.length === 1 ? 'reconhecimento cadastrado' : 'reconhecimentos cadastrados'}`;
   if (!entries.length) {
     body.innerHTML = '<tr><td colspan="7">Nenhum reconhecimento cadastrado.</td></tr>';
     return;
@@ -592,12 +657,12 @@ async function deleteRecognition(period, index) {
   const reason = `Exclusão do reconhecimento: ${existing.titulo || 'Sem título'}`;
   const responsible = admin$('#upload-responsible').value.trim() || 'Administração';
   saved.metadata = { ...saved.metadata, updatedAt: timestamp, version: nextDataVersion(current.data.metadata?.version), recordCount: metrics.ideas, uploadedBy: responsible, updateReason: reason };
-  commitValidatedUpload(saved, current.data, { timestamp, file: 'Exclusão de reconhecimento', reason, responsible, ideas: metrics.ideas, collaborators: metrics.collaborators, areas: metrics.areas });
+  const warnings = commitValidatedUpload(saved, current.data, { timestamp, file: 'Exclusão de reconhecimento', reason, responsible, ideas: metrics.ideas, collaborators: metrics.collaborators, areas: metrics.areas }, { recognitionOnly: true });
   if (recognitionEditing?.period === period) {
     if (recognitionEditing.index === index) resetRecognitionForm();
     else if (recognitionEditing.index > index) recognitionEditing.index -= 1;
   }
-  admin$('#recognition-message').textContent = 'Reconhecimento excluído da carga local. Clique em Atualizar Portal para publicar a alteração.';
+  admin$('#recognition-message').textContent = `Reconhecimento removido da carga. ${warnings.join(' ')}${warnings.length ? ' ' : 'Clique em Atualizar Portal para publicar a alteração.'}`;
   await renderRecognitionsList(saved);
   updatePublishButton();
   await refreshDataDiagnostic();
@@ -764,10 +829,10 @@ admin$('#recognition-form').addEventListener('submit', async (event) => {
     const responsible = admin$('#upload-responsible').value.trim() || 'Administração';
     const actionLabel = wasEditing ? 'Edição de reconhecimento' : 'Cadastro de reconhecimento';
     saved.metadata = { ...saved.metadata, updatedAt: timestamp, version: nextDataVersion(current.data.metadata?.version), recordCount: metrics.ideas, uploadedBy: responsible, updateReason: reason };
-    commitValidatedUpload(saved, current.data, { timestamp, file: actionLabel, reason, responsible, ideas: metrics.ideas, collaborators: metrics.collaborators, areas: metrics.areas });
+    const warnings = commitValidatedUpload(saved, current.data, { timestamp, file: actionLabel, reason, responsible, ideas: metrics.ideas, collaborators: metrics.collaborators, areas: metrics.areas }, { recognitionOnly: true });
     resetRecognitionForm();
     message.style.color = '';
-    message.textContent = `${wasEditing ? 'Reconhecimento atualizado' : 'Reconhecimento cadastrado'} na carga local. Clique em Atualizar Portal para publicar a alteração.`;
+    message.textContent = `${wasEditing ? 'Reconhecimento atualizado' : 'Reconhecimento cadastrado'} na carga. ${warnings.join(' ')}${warnings.length ? ' ' : 'Clique em Atualizar Portal para publicar a alteração.'}`;
     await renderRecognitionsList(saved);
     updatePublishButton();
     await refreshDataDiagnostic();
