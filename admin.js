@@ -36,8 +36,10 @@ const historyStorageKey = 'portalHistoricoAtualizacoes';
 const dataStorageKey = 'programaIdeiasData';
 const backupStorageKey = 'programaIdeiasDataBackup';
 const publicationStatusKey = 'portalPublicationStatus';
+const githubTokenStorageKey = 'portalGitHubToken';
 const githubRepository = { owner: 'DMOS15', name: 'PROGRAMA_IDEIAS', branch: 'main', path: 'dados/ideias.json' };
 let activeGitHubToken = '';
+let lastPublishedAt = '';
 const escapeHistoryCell = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
 const datasetMetrics = (data) => {
   const ideas = Array.isArray(data?.ideias) ? data.ideias.filter((idea) => idea && typeof idea === 'object' && ideaNumberKey(idea.numero)) : [];
@@ -79,7 +81,7 @@ function compareDataVersions(left, right) {
 async function loadAdminCurrentData() {
   const published = await loadPublishedData();
   const local = readStoredData(dataStorageKey);
-  if (local && (!published.data || compareDataVersions(local.metadata?.version, published.data.metadata?.version) > 0)) return { data: local, source: 'LocalStorage' };
+  if (local && (!published.data || compareDataVersions(local.metadata?.version, published.data.metadata?.version) > 0)) return { ...published, data: local, source: 'LocalStorage' };
   return published;
 }
 function downloadDataset(data) {
@@ -137,6 +139,28 @@ function readPublicationStatus() {
   try { return JSON.parse(localStorage.getItem(publicationStatusKey) || 'null'); }
   catch (error) { console.warn('[Publicação] Estado de sincronização local inválido.', error); return null; }
 }
+function renderGitHubConnectionSummary(loadedData) {
+  const target = admin$('#github-connection-summary');
+  if (!target) return;
+  const publishedAt = loadedData?.publishedData?.metadata?.updatedAt;
+  const sync = readPublicationStatus();
+  if (sync?.status === 'published' && sync.syncedAt) lastPublishedAt = sync.syncedAt;
+  else if (publishedAt) lastPublishedAt = publishedAt;
+  const date = lastPublishedAt ? new Date(lastPublishedAt) : null;
+  const dateLabel = date && !Number.isNaN(date.getTime()) ? date.toLocaleString('pt-BR') : 'Nenhuma publicação registrada';
+  const connectionLabel = activeGitHubToken ? '✅ GitHub conectado' : 'GitHub desconectado';
+  target.innerHTML = `<strong>${connectionLabel}</strong><div>Repositório: ${githubRepository.owner}/${githubRepository.name}</div><div>Última publicação: ${escapeHistoryCell(dateLabel)}</div>`;
+}
+function updateGitHubConnectionUI(message) {
+  const connected = Boolean(activeGitHubToken);
+  const controls = admin$('#github-token-controls');
+  const replaceButton = admin$('#replace-github-token');
+  const status = admin$('#github-token-status');
+  if (controls) controls.hidden = connected;
+  if (replaceButton) replaceButton.hidden = !connected;
+  if (status && message !== undefined) status.textContent = message;
+  renderGitHubConnectionSummary();
+}
 function renderUploadSummary(data, fileName = '') {
   const summary = admin$('#upload-summary');
   if (!summary || !data) return;
@@ -151,12 +175,13 @@ function updatePublishButton() {
   if (!button) return;
   const hasPendingData = Boolean(readStoredData(dataStorageKey));
   button.disabled = !hasPendingData || button.dataset.publishing === 'true';
-  button.title = !hasPendingData ? 'Carregue e valide um arquivo antes de publicar.' : !activeGitHubToken ? 'Conecte um token do GitHub na configuração avançada para publicar.' : '';
+  button.title = !hasPendingData ? 'Carregue e valide um arquivo antes de publicar.' : !activeGitHubToken ? 'Conecte um token do GitHub nas configurações avançadas para publicar.' : '';
 }
 async function renderPublicationCard(loadedData) {
   const target = admin$('#publication-status');
   if (!target) return;
   const loaded = loadedData || await loadAdminCurrentData();
+  renderGitHubConnectionSummary(loaded);
   const data = loaded.data;
   const sync = readPublicationStatus();
   const local = readStoredData(dataStorageKey);
@@ -228,11 +253,73 @@ async function publishCurrentDataset() {
     updatePublishButton();
   }
 }
+async function validateGitHubToken(token) {
+  const endpoint = `https://api.github.com/repos/${githubRepository.owner}/${githubRepository.name}/contents/${githubRepository.path}?ref=${githubRepository.branch}`;
+  const response = await fetch(endpoint, {
+    headers: { Accept: 'application/vnd.github+json', Authorization: `Bearer ${token}`, 'X-GitHub-Api-Version': '2022-11-28' },
+    cache: 'no-store'
+  });
+  const file = await githubResponseJson(response);
+  if (!file.sha) throw new Error('O GitHub não confirmou acesso ao arquivo publicado.');
+}
+async function connectGitHubToken(token, remember, automatic = false) {
+  const field = admin$('#github-token');
+  const connectButton = admin$('#connect-github');
+  const status = admin$('#github-token-status');
+  const rememberCheckbox = admin$('#remember-github-token');
+  if (!token) {
+    status.textContent = 'Informe um token para validar o acesso ao repositório.';
+    updatePublishButton();
+    return false;
+  }
+  connectButton.disabled = true;
+  status.textContent = 'Validando token e acesso ao repositório...';
+  status.removeAttribute('title');
+  try {
+    await validateGitHubToken(token);
+    try {
+      if (remember) localStorage.setItem(githubTokenStorageKey, token);
+      else localStorage.removeItem(githubTokenStorageKey);
+    } catch (error) {
+      throw new Error(`Token validado, mas não foi possível atualizar o armazenamento neste navegador: ${error.message}`);
+    }
+    activeGitHubToken = token;
+    field.value = '';
+    status.textContent = automatic ? '✅ Conectado automaticamente; token lembrado neste navegador.' : remember ? '✅ Conectado e token lembrado neste navegador.' : '✅ Conectado nesta sessão.';
+    status.title = `Acesso validado a ${githubRepository.owner}/${githubRepository.name}.`;
+    if (rememberCheckbox) rememberCheckbox.checked = remember;
+    updateGitHubConnectionUI(status.textContent);
+    updatePublishButton();
+    return true;
+  } catch (error) {
+    activeGitHubToken = '';
+    status.textContent = `❌ Não foi possível conectar. ${error.message}`;
+    updateGitHubConnectionUI(status.textContent);
+    updatePublishButton();
+    return false;
+  } finally {
+    connectButton.disabled = false;
+  }
+}
+async function connectRememberedGitHubToken() {
+  const status = admin$('#github-token-status');
+  const advanced = admin$('#advanced-publication');
+  let token;
+  try { token = localStorage.getItem(githubTokenStorageKey); }
+  catch (error) {
+    status.textContent = `❌ Não foi possível ler o token salvo neste navegador: ${error.message}`;
+    advanced.open = true;
+    return;
+  }
+  if (!token) return;
+  admin$('#remember-github-token').checked = true;
+  if (!await connectGitHubToken(token, true, true)) advanced.open = true;
+}
 function setupAdminReliabilityUI() {
   const guidance = admin$('#admin-panel > p');
   if (guidance) guidance.textContent = 'Importe a planilha e publique uma carga validada diretamente no portal.';
   const adminNote = admin$('.admin-footer');
-  if (adminNote) adminNote.textContent = 'A integração usa um token fine-grained do GitHub apenas nesta sessão. Restrinja-o a este repositório, conceda somente Contents: Read and write e configure expiração; o token nunca é salvo no navegador.';
+  if (adminNote) adminNote.textContent = 'O token fine-grained pode ser lembrado neste navegador. Tokens salvos no navegador podem ser acessados por scripts executados nesta origem; use somente em dispositivo confiável, restrinja o acesso ao repositório DMOS15/PROGRAMA_IDEIAS e conceda apenas Contents: Read and write.';
   const uploadBox = admin$('.upload-box');
   if (!uploadBox) return;
   const excelInput = admin$('#excel-upload');
@@ -251,8 +338,14 @@ function setupAdminReliabilityUI() {
   summary.id = 'upload-summary';
   summary.hidden = true;
   summary.style.cssText = 'margin-top:20px;padding:18px;border:1px solid var(--line);text-align:left';
+  const connectionSummary = document.createElement('div');
+  connectionSummary.id = 'github-connection-summary';
+  connectionSummary.setAttribute('role', 'status');
+  connectionSummary.style.cssText = 'display:grid;gap:4px;margin:0 0 16px;text-align:left';
+  uploadBox.append(connectionSummary);
   uploadBox.append(summary);
   uploadBox.append(publishButton);
+  renderGitHubConnectionSummary();
   const publicationCard = document.createElement('section');
   publicationCard.className = 'admin-section';
   publicationCard.id = 'publication-card';
@@ -261,7 +354,21 @@ function setupAdminReliabilityUI() {
   const advanced = document.createElement('details');
   advanced.className = 'admin-section';
   advanced.id = 'advanced-publication';
-  advanced.innerHTML = '<summary style="cursor:pointer;font-weight:700">Configuração avançada da publicação</summary><p>Use um token fine-grained com acesso somente a Contents: Read and write neste repositório. O token é usado apenas nesta sessão e não é armazenado.</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0"><label>Responsável pela carga<input id="upload-responsible" type="text" value="Administração" autocomplete="name"></label><label>Justificativa<input id="upload-reason" type="text" value="Atualização da base de ideias" maxlength="240"></label></div><label for="github-token">Token pessoal do GitHub</label><input id="github-token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_..." style="display:block;width:min(100%,520px);margin:8px 0;padding:12px"><div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="admin-action" id="connect-github">Conectar nesta sessão</button><button type="button" class="admin-action" id="download-data">Baixar JSON</button><button type="button" class="admin-action" id="restore-data" hidden>Restaurar última base</button></div><small id="github-token-status" role="status"></small>';
+  advanced.innerHTML = `
+    <summary style="cursor:pointer;font-weight:700">Configurações avançadas da publicação</summary>
+    <p>Use um token fine-grained com acesso somente a Contents: Read and write neste repositório. Se optar por lembrá-lo, ele será armazenado neste navegador; faça isso apenas em um dispositivo confiável.</p>
+    <h3>Token GitHub</h3>
+    <div id="github-token-controls">
+      <label for="github-token">Token pessoal do GitHub</label>
+      <input id="github-token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_..." style="display:block;width:min(100%,520px);margin:8px 0;padding:12px">
+      <label style="display:flex;align-items:center;gap:8px;margin:10px 0"><input id="remember-github-token" type="checkbox"> Lembrar token neste navegador</label>
+      <button type="button" class="admin-action" id="connect-github">Conectar ao GitHub</button>
+    </div>
+    <button type="button" class="admin-action" id="replace-github-token" hidden>Trocar Token</button>
+    <small id="github-token-status" role="status"></small>
+    <h3>Ferramentas avançadas</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0"><label>Responsável pela carga<input id="upload-responsible" type="text" value="Administração" autocomplete="name"></label><label>Justificativa<input id="upload-reason" type="text" value="Atualização da base de ideias" maxlength="240"></label></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="admin-action" id="download-data">Baixar JSON</button><button type="button" class="admin-action" id="restore-data" hidden>Restaurar última base</button></div>`;
   publicationCard.after(advanced);
   const historySection = [...document.querySelectorAll('.admin-section')].find((section) => section.querySelector('#history-body'));
   if (historySection) {
@@ -295,44 +402,30 @@ function setupAdminReliabilityUI() {
     admin$('#upload-message').textContent = `Base ${backup.metadata?.version || ''} restaurada no LocalStorage. Baixe o JSON para publicá-la.`;
     refreshDataDiagnostic();
   });
-  admin$('#connect-github').addEventListener('click', async () => {
-    const field = admin$('#github-token');
-    const connectButton = admin$('#connect-github');
-    const status = admin$('#github-token-status');
-    const token = field.value.trim();
-    field.value = '';
-    activeGitHubToken = '';
-    if (!token) {
-      status.textContent = '❌ Token inválido';
-      status.title = 'Informe um token para validar o acesso ao repositório.';
-      updatePublishButton();
+  admin$('#replace-github-token').addEventListener('click', () => {
+    try { localStorage.removeItem(githubTokenStorageKey); }
+    catch (error) {
+      admin$('#github-token-status').textContent = `❌ Não foi possível remover o token salvo: ${error.message}`;
       return;
     }
-    connectButton.disabled = true;
-    status.textContent = 'Validando token e acesso ao repositório...';
-    status.removeAttribute('title');
-    try {
-      const endpoint = `https://api.github.com/repos/${githubRepository.owner}/${githubRepository.name}/contents/${githubRepository.path}?ref=${githubRepository.branch}`;
-      const response = await fetch(endpoint, {
-        headers: { Accept: 'application/vnd.github+json', Authorization: `Bearer ${token}`, 'X-GitHub-Api-Version': '2022-11-28' },
-        cache: 'no-store'
-      });
-      const file = await githubResponseJson(response);
-      if (!file.sha) throw new Error('O GitHub não confirmou acesso ao arquivo publicado.');
-      activeGitHubToken = token;
-      status.textContent = '✅ Conectado ao GitHub';
-      status.title = `Acesso validado a ${githubRepository.owner}/${githubRepository.name}.`;
-    } catch (error) {
-      status.textContent = '❌ Token inválido';
-      status.title = error.message;
-    } finally {
-      connectButton.disabled = false;
-      updatePublishButton();
-    }
+    activeGitHubToken = '';
+    admin$('#github-token').value = '';
+    admin$('#remember-github-token').checked = false;
+    advanced.open = true;
+    updateGitHubConnectionUI('Informe e valide o novo token.');
+    updatePublishButton();
+    admin$('#github-token').focus();
+  });
+  admin$('#connect-github').addEventListener('click', () => {
+    void connectGitHubToken(admin$('#github-token').value.trim(), admin$('#remember-github-token').checked);
   });
   publishButton.addEventListener('click', publishCurrentDataset);
   renderPublicationCard();
-  loadAdminCurrentData().then(({ data }) => renderUploadSummary(data)).catch((error) => console.warn('[Administração] Não foi possível carregar o resumo inicial.', error));
+  loadAdminCurrentData().then((loaded) => {
+    renderUploadSummary(loaded.data);
+    renderGitHubConnectionSummary(loaded);
+  }).catch((error) => console.warn('[Administração] Não foi possível carregar o resumo inicial.', error));
+  void connectRememberedGitHubToken();
 }
 async function refreshDataDiagnostic() {
   const target = admin$('#data-diagnostic');
