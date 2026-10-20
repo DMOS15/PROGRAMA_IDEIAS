@@ -40,6 +40,7 @@ const githubTokenStorageKey = 'portalGitHubToken';
 const githubRepository = { owner: 'DMOS15', name: 'PROGRAMA_IDEIAS', branch: 'main', path: 'dados/ideias.json' };
 let activeGitHubToken = '';
 let lastPublishedAt = '';
+let recognitionEditing = null;
 const escapeHistoryCell = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
 const datasetMetrics = (data) => {
   const ideas = Array.isArray(data?.ideias) ? data.ideias.filter((idea) => idea && typeof idea === 'object' && ideaNumberKey(idea.numero)) : [];
@@ -498,6 +499,109 @@ function commitValidatedUpload(data, previous, historyEntry) {
     throw error;
   }
 }
+function cloneRecognitions(data) {
+  return {
+    trimestre: Array.isArray(data?.reconhecidas?.trimestre) ? [...data.reconhecidas.trimestre] : [],
+    semestre: Array.isArray(data?.reconhecidas?.semestre) ? [...data.reconhecidas.semestre] : []
+  };
+}
+function formatRecognitionDate(value) {
+  if (!value) return 'Não informada';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? 'Não informada' : date.toLocaleString('pt-BR');
+}
+async function renderRecognitionsList(data) {
+  const body = admin$('#recognitions-list');
+  if (!body) return;
+  const current = data ? { data } : await loadAdminCurrentData();
+  const recognitions = current.data?.reconhecidas || {};
+  const entries = ['trimestre', 'semestre'].flatMap((period) => {
+    const items = Array.isArray(recognitions[period]) ? recognitions[period] : [];
+    return items.map((item, index) => ({ period, item, index }));
+  });
+  if (!entries.length) {
+    body.innerHTML = '<tr><td colspan="7">Nenhum reconhecimento cadastrado.</td></tr>';
+    return;
+  }
+  body.innerHTML = entries.map(({ period, item, index }) => `<tr><td>${period === 'trimestre' ? 'Trimestre' : 'Semestre'}</td><td>${escapeHistoryCell(item.titulo || '')}</td><td>${escapeHistoryCell(item.autor || item.colaborador || '')}</td><td>${escapeHistoryCell(item.area || '')}</td><td>${escapeHistoryCell(item.subcategoria || '')}</td><td>${escapeHistoryCell(formatRecognitionDate(item.criadoEm))}</td><td><button class="admin-action" type="button" data-recognition-action="edit" data-period="${period}" data-index="${index}">Editar</button> <button class="admin-action" type="button" data-recognition-action="delete" data-period="${period}" data-index="${index}">Excluir</button></td></tr>`).join('');
+}
+function resetRecognitionForm() {
+  recognitionEditing = null;
+  admin$('#recognition-form').reset();
+  admin$('#recognition-submit').textContent = 'Cadastrar reconhecimento';
+  admin$('#recognition-cancel-edit').hidden = true;
+  const preview = admin$('#recognition-photo-preview');
+  preview.replaceChildren();
+  preview.hidden = true;
+}
+async function readRecognitionPhoto(file) {
+  if (!file) return '';
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => typeof reader.result === 'string' ? resolve(reader.result) : reject(new Error('Não foi possível ler a foto selecionada.'));
+    reader.onerror = () => reject(reader.error || new Error('Não foi possível ler a foto selecionada.'));
+    reader.readAsDataURL(file);
+  });
+}
+async function editRecognition(period, index) {
+  const current = await loadAdminCurrentData();
+  const item = current.data?.reconhecidas?.[period]?.[index];
+  if (!item) throw new Error('Este reconhecimento não está mais disponível. Atualize a lista e tente novamente.');
+  recognitionEditing = { period, index };
+  admin$('#recognition-period').value = period;
+  admin$('#recognition-title').value = item.titulo || '';
+  admin$('#recognition-author').value = item.autor || item.colaborador || '';
+  admin$('#recognition-area').value = item.area || '';
+  const subcategory = admin$('#recognition-subcategory');
+  if (item.subcategoria && ![...subcategory.options].some((option) => option.value === item.subcategoria)) {
+    const option = document.createElement('option');
+    option.value = item.subcategoria;
+    option.textContent = item.subcategoria;
+    subcategory.append(option);
+  }
+  subcategory.value = item.subcategoria || '';
+  admin$('#recognition-reason').value = item.motivo || '';
+  admin$('#recognition-photo').value = '';
+  admin$('#recognition-submit').textContent = 'Salvar alterações';
+  admin$('#recognition-cancel-edit').hidden = false;
+  const preview = admin$('#recognition-photo-preview');
+  preview.replaceChildren();
+  preview.hidden = !item.foto;
+  if (item.foto) {
+    const image = document.createElement('img');
+    image.src = item.foto;
+    image.alt = 'Foto atual do reconhecimento';
+    image.style.cssText = 'display:block;max-width:180px;max-height:140px;margin-top:8px';
+    preview.append('Foto atual (selecione outra para substituir):', image);
+  }
+  admin$('#recognition-message').textContent = 'Edite os campos e salve as alterações.';
+  admin$('#recognition-title').focus();
+}
+async function deleteRecognition(period, index) {
+  if (!window.confirm('Deseja realmente excluir este reconhecimento?')) return;
+  const current = await loadAdminCurrentData();
+  const existing = current.data?.reconhecidas?.[period]?.[index];
+  if (!existing) throw new Error('Este reconhecimento não está mais disponível. Atualize a lista e tente novamente.');
+  const saved = {
+    ...current.data,
+    reconhecidas: cloneRecognitions(current.data)
+  };
+  saved.reconhecidas[period].splice(index, 1);
+  const timestamp = new Date().toISOString();
+  const metrics = datasetMetrics(saved);
+  const reason = `Exclusão do reconhecimento: ${existing.titulo || 'Sem título'}`;
+  const responsible = admin$('#upload-responsible').value.trim() || 'Administração';
+  saved.metadata = { ...saved.metadata, updatedAt: timestamp, version: nextDataVersion(current.data.metadata?.version), recordCount: metrics.ideas, uploadedBy: responsible, updateReason: reason };
+  commitValidatedUpload(saved, current.data, { timestamp, file: 'Exclusão de reconhecimento', reason, responsible, ideas: metrics.ideas, collaborators: metrics.collaborators, areas: metrics.areas });
+  if (recognitionEditing?.period === period) {
+    if (recognitionEditing.index === index) resetRecognitionForm();
+    else if (recognitionEditing.index > index) recognitionEditing.index -= 1;
+  }
+  admin$('#recognition-message').textContent = 'Reconhecimento excluído da carga local. Clique em Atualizar Portal para publicar a alteração.';
+  await renderRecognitionsList(saved);
+  updatePublishButton();
+  await refreshDataDiagnostic();
+}
 async function addRecognitionSubcategoryField() {
   const form = admin$('#recognition-form');
   const photo = admin$('#recognition-photo');
@@ -521,6 +625,7 @@ async function addRecognitionSubcategoryField() {
 addRecognitionSubcategoryField();
 setupAdminReliabilityUI();
 renderUpdateHistory();
+renderRecognitionsList().catch((error) => console.error('[Reconhecimento] Falha ao carregar a lista:', error));
 refreshDataDiagnostic();
 
 admin$('#admin-pin-form').addEventListener('submit', (event) => { event.preventDefault(); if (admin$('#admin-pin').value === 'JDEPIU') { admin$('#admin-gate').style.display = 'none'; admin$('#admin-panel').style.display = 'block'; refreshDataDiagnostic(); } else admin$('#admin-error').textContent = 'PIN incorreto. Tente novamente.'; });
@@ -556,6 +661,9 @@ admin$('#excel-upload').addEventListener('change', async (event) => {
     data.ideias = consolidateIdeas(ideiasOriginais, data.canceladas);
     logIdeaStatusTotals(ideiasOriginais.length, data.canceladas.length, data.ideias);
     const current = await loadAdminCurrentData();
+    if (!file.name.toLowerCase().endsWith('.json') && current.data?.reconhecidas) {
+      data.reconhecidas = cloneRecognitions(current.data);
+    }
     const previousMetrics = current.data ? datasetMetrics(current.data) : null;
     const cadastroAreas = uniqueAreas((data.cadastro || []).map((person) => person.area));
     const ideaAreas = uniqueAreas((data.ideias || []).map((idea) => idea.areaTrabalho || idea.grupo));
@@ -588,11 +696,33 @@ admin$('#excel-upload').addEventListener('change', async (event) => {
     const historyEntry = { timestamp, file: file.name, reason, responsible, ideas: metrics.ideas, collaborators: metrics.collaborators, areas: metrics.areas };
     commitValidatedUpload(data, current.data, historyEntry);
     renderUploadSummary(data, file.name);
+    renderRecognitionsList(data);
     admin$('#upload-message').style.color = '';
     admin$('#upload-message').textContent = `Carga ${data.metadata.version} processada e validada. Pronta para publicação.`;
     updatePublishButton();
     refreshDataDiagnostic();
   } catch (error) { console.error('[Importação] Falha ao processar arquivo:', error); admin$('#upload-message').style.color = 'var(--red)'; admin$('#upload-message').textContent = `Não foi possível concluir a carga. ${error.message} A última base válida foi mantida.`; }
+});
+admin$('#recognition-cancel-edit').addEventListener('click', resetRecognitionForm);
+admin$('#recognitions-list').addEventListener('click', async (event) => {
+  const button = event.target.closest('button[data-recognition-action]');
+  if (!button) return;
+  const { recognitionAction: action, period, index: rawIndex } = button.dataset;
+  const index = Number(rawIndex);
+  const message = admin$('#recognition-message');
+  message.style.color = '';
+  button.disabled = true;
+  try {
+    if (!['trimestre', 'semestre'].includes(period) || !Number.isInteger(index) || index < 0) throw new Error('A seleção do reconhecimento é inválida.');
+    if (action === 'edit') await editRecognition(period, index);
+    else if (action === 'delete') await deleteRecognition(period, index);
+  } catch (error) {
+    console.error('[Reconhecimento] Falha ao gerenciar reconhecimento:', error);
+    message.style.color = 'var(--red)';
+    message.textContent = `Não foi possível concluir a ação. ${error.message}`;
+  } finally {
+    button.disabled = false;
+  }
 });
 admin$('#recognition-form').addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -600,19 +730,47 @@ admin$('#recognition-form').addEventListener('submit', async (event) => {
   try {
     const current = await loadAdminCurrentData();
     if (!current.data || !validDataset(current.data)) throw new Error('Carregue uma base válida antes de cadastrar reconhecimentos.');
-    const saved = { ...current.data, reconhecidas: { trimestre: [...(current.data.reconhecidas?.trimestre || [])], semestre: [...(current.data.reconhecidas?.semestre || [])] } };
+    const saved = { ...current.data, reconhecidas: cloneRecognitions(current.data) };
+    const targetPeriod = admin$('#recognition-period').value;
+    if (!['trimestre', 'semestre'].includes(targetPeriod)) throw new Error('Selecione um período válido.');
+    const wasEditing = Boolean(recognitionEditing);
+    const existing = recognitionEditing ? current.data.reconhecidas?.[recognitionEditing.period]?.[recognitionEditing.index] : null;
+    if (recognitionEditing && !existing) throw new Error('Este reconhecimento não está mais disponível. Atualize a lista e tente novamente.');
     const file = admin$('#recognition-photo').files[0];
-    const photo = file ? await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = () => reject(reader.error); reader.readAsDataURL(file); }) : '';
+    const photo = file ? await readRecognitionPhoto(file) : existing?.foto || '';
     const reason = admin$('#recognition-reason').value.trim() || 'Cadastro de reconhecimento';
-    saved.reconhecidas[admin$('#recognition-period').value].unshift({ titulo: admin$('#recognition-title').value, autor: admin$('#recognition-author').value, area: admin$('#recognition-area').value, subcategoria: admin$('#recognition-subcategory').value, motivo: reason, foto: photo });
     const timestamp = new Date().toISOString();
+    const recognition = {
+      ...(existing || {}),
+      titulo: admin$('#recognition-title').value.trim(),
+      autor: admin$('#recognition-author').value.trim(),
+      area: admin$('#recognition-area').value.trim(),
+      subcategoria: admin$('#recognition-subcategory').value,
+      motivo: reason,
+      foto: photo,
+      criadoEm: existing?.criadoEm || timestamp
+    };
+    if (recognitionEditing) {
+      saved.reconhecidas[recognitionEditing.period].splice(recognitionEditing.index, 1);
+      if (targetPeriod === recognitionEditing.period) {
+        saved.reconhecidas[targetPeriod].splice(recognitionEditing.index, 0, recognition);
+      } else {
+        saved.reconhecidas[targetPeriod].unshift(recognition);
+      }
+    } else {
+      saved.reconhecidas[targetPeriod].unshift(recognition);
+    }
     const metrics = datasetMetrics(saved);
     const responsible = admin$('#upload-responsible').value.trim() || 'Administração';
+    const actionLabel = wasEditing ? 'Edição de reconhecimento' : 'Cadastro de reconhecimento';
     saved.metadata = { ...saved.metadata, updatedAt: timestamp, version: nextDataVersion(current.data.metadata?.version), recordCount: metrics.ideas, uploadedBy: responsible, updateReason: reason };
-    commitValidatedUpload(saved, current.data, { timestamp, file: 'Reconhecimento administrativo', reason, responsible, ideas: metrics.ideas, collaborators: metrics.collaborators, areas: metrics.areas });
-    message.textContent = 'Reconhecimento salvo. Baixe e publique o JSON para disponibilizar a atualização a todos.';
-    event.target.reset();
-    refreshDataDiagnostic();
+    commitValidatedUpload(saved, current.data, { timestamp, file: actionLabel, reason, responsible, ideas: metrics.ideas, collaborators: metrics.collaborators, areas: metrics.areas });
+    resetRecognitionForm();
+    message.style.color = '';
+    message.textContent = `${wasEditing ? 'Reconhecimento atualizado' : 'Reconhecimento cadastrado'} na carga local. Clique em Atualizar Portal para publicar a alteração.`;
+    await renderRecognitionsList(saved);
+    updatePublishButton();
+    await refreshDataDiagnostic();
   } catch (error) {
     console.error('[Reconhecimento] Falha ao salvar cadastro:', error);
     message.textContent = `Não foi possível salvar o reconhecimento. ${error.message}`;
