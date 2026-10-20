@@ -156,9 +156,8 @@ function updatePublishButton() {
 async function renderPublicationCard(loadedData) {
   const target = admin$('#publication-status');
   if (!target) return;
-  const loaded = loadedData || await loadPublishedData();
+  const loaded = loadedData || await loadAdminCurrentData();
   const data = loaded.data;
-  const metrics = data ? datasetMetrics(data) : { ideas: 0, collaborators: 0, areas: 0 };
   const sync = readPublicationStatus();
   const local = readStoredData(dataStorageKey);
   const hasUnpublishedLocal = Boolean(local && (!loaded.publishedData || compareDataVersions(local.metadata?.version, loaded.publishedData.metadata?.version) > 0));
@@ -171,7 +170,7 @@ async function renderPublicationCard(loadedData) {
   const updatedLabel = updatedAt && !Number.isNaN(updatedAt.getTime()) ? updatedAt.toLocaleString('pt-BR') : 'Não informada';
   const syncedAt = sync?.syncedAt ? new Date(sync.syncedAt) : null;
   const syncedLabel = (isPublished || isCommitted) && syncedAt && !Number.isNaN(syncedAt.getTime()) ? syncedAt.toLocaleString('pt-BR') : loaded.source === 'dados/ideias.json' ? 'Conforme JSON publicado' : 'Pendente';
-  target.innerHTML = `<dl style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:14px 0"><div><dt>Status</dt><dd>${escapeHistoryCell(statusText)}</dd></div><div><dt>Última atualização</dt><dd>${escapeHistoryCell(updatedLabel)}</dd></div><div><dt>Última sincronização</dt><dd>${escapeHistoryCell(syncedLabel)}</dd></div><div><dt>Versão</dt><dd>${escapeHistoryCell(data?.metadata?.version || 'Não informada')}</dd></div><div><dt>Quantidade de ideias</dt><dd>${metrics.ideas}</dd></div><div><dt>Quantidade de colaboradores</dt><dd>${metrics.collaborators}</dd></div><div><dt>Quantidade de áreas</dt><dd>${metrics.areas}</dd></div></dl>`;
+  target.innerHTML = `<dl style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0"><div><dt>Status da publicação</dt><dd>${escapeHistoryCell(statusText)}</dd></div><div><dt>Última atualização</dt><dd>${escapeHistoryCell(updatedLabel)}</dd></div></dl>`;
 }
 async function waitForGitHubPages(data, timeoutMs = 30000) {
   const deadline = Date.now() + timeoutMs;
@@ -277,7 +276,6 @@ function setupAdminReliabilityUI() {
       header.append(cell);
     }
   }
-  advanced.append(publicationCard);
   if (historySection) advanced.append(historySection);
   const diagnosticSection = [...document.querySelectorAll('.admin-section')].find((section) => section.querySelector('#data-diagnostic'));
   if (diagnosticSection) advanced.append(diagnosticSection);
@@ -297,12 +295,40 @@ function setupAdminReliabilityUI() {
     admin$('#upload-message').textContent = `Base ${backup.metadata?.version || ''} restaurada no LocalStorage. Baixe o JSON para publicá-la.`;
     refreshDataDiagnostic();
   });
-  admin$('#connect-github').addEventListener('click', () => {
+  admin$('#connect-github').addEventListener('click', async () => {
     const field = admin$('#github-token');
-    activeGitHubToken = field.value.trim();
+    const connectButton = admin$('#connect-github');
+    const status = admin$('#github-token-status');
+    const token = field.value.trim();
     field.value = '';
-    admin$('#github-token-status').textContent = activeGitHubToken ? 'Credencial ativa somente nesta sessão.' : 'Informe um token válido.';
-    updatePublishButton();
+    activeGitHubToken = '';
+    if (!token) {
+      status.textContent = '❌ Token inválido';
+      status.title = 'Informe um token para validar o acesso ao repositório.';
+      updatePublishButton();
+      return;
+    }
+    connectButton.disabled = true;
+    status.textContent = 'Validando token e acesso ao repositório...';
+    status.removeAttribute('title');
+    try {
+      const endpoint = `https://api.github.com/repos/${githubRepository.owner}/${githubRepository.name}/contents/${githubRepository.path}?ref=${githubRepository.branch}`;
+      const response = await fetch(endpoint, {
+        headers: { Accept: 'application/vnd.github+json', Authorization: `Bearer ${token}`, 'X-GitHub-Api-Version': '2022-11-28' },
+        cache: 'no-store'
+      });
+      const file = await githubResponseJson(response);
+      if (!file.sha) throw new Error('O GitHub não confirmou acesso ao arquivo publicado.');
+      activeGitHubToken = token;
+      status.textContent = '✅ Conectado ao GitHub';
+      status.title = `Acesso validado a ${githubRepository.owner}/${githubRepository.name}.`;
+    } catch (error) {
+      status.textContent = '❌ Token inválido';
+      status.title = error.message;
+    } finally {
+      connectButton.disabled = false;
+      updatePublishButton();
+    }
   });
   publishButton.addEventListener('click', publishCurrentDataset);
   renderPublicationCard();
@@ -329,7 +355,7 @@ async function refreshDataDiagnostic() {
   const portalStatus = isPublished ? 'Publicado no GitHub Pages' : isCommitted ? 'Commit enviado; deploy do Pages pendente' : localIsNewer ? 'Carga validada; publicação pendente' : published.source === 'dados/ideias.json' ? 'Publicado' : 'Pendente de publicação';
   target.innerHTML = `<dl style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin:16px 0 0"><div><dt>Portal atualizado</dt><dd>${portalStatus}</dd></div><div><dt>Última sincronização</dt><dd>${escapeHistoryCell(syncedLabel)}</dd></div><div><dt>Versão</dt><dd>${escapeHistoryCell(data?.metadata?.version || 'Não informada')}</dd></div><div><dt>Fonte dos dados</dt><dd>${escapeHistoryCell(published.source)}</dd></div></dl>`;
   if (local && (!published.publishedData || compareDataVersions(local.metadata?.version, published.publishedData.metadata?.version) > 0)) admin$('#publish-portal').disabled = !activeGitHubToken;
-  await renderPublicationCard(published);
+  await renderPublicationCard();
   updatePublishButton();
   const restoreButton = admin$('#restore-data');
   if (restoreButton) restoreButton.hidden = !backup;
