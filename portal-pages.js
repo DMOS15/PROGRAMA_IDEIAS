@@ -42,34 +42,27 @@ function isUsablePortalData(data) {
   if (!areas.size) (Array.isArray(data?.baseDmos) ? data.baseDmos : []).forEach((person) => { const area = pageNormalize(person.area); if (area) areas.add(area); });
   return ideas.length > 0 && collaborators.length > 0 && areas.size > 0;
 }
-function comparePortalVersions(left, right) {
-  const parts = (value) => String(value || '').split('.').map((part) => Number(part) || 0);
-  const leftParts = parts(left);
-  const rightParts = parts(right);
-  for (let index = 0; index < 3; index += 1) if ((leftParts[index] || 0) !== (rightParts[index] || 0)) return (leftParts[index] || 0) - (rightParts[index] || 0);
-  return 0;
-}
 async function getPortalData() {
   let jsonData = null;
   try {
-    const response = await fetch('dados/ideias.json', { cache: 'no-store' });
+    const response = await fetch(`dados/ideias.json?v=${Date.now()}`, { cache: 'no-store' });
     if (!response.ok) throw new Error(`Falha ao carregar dados/ideias.json: ${response.status}`);
     const data = await response.json();
     if (isUsablePortalData(data)) jsonData = data;
     else console.error('dados/ideias.json não passou na validação; verificando LocalStorage.');
   } catch (error) { console.warn('Não foi possível carregar dados/ideias.json; tentando LocalStorage.', error); }
-  try {
-    const stored = localStorage.getItem('programaIdeiasData');
-    const data = stored ? JSON.parse(stored) : null;
-    if (isUsablePortalData(data) && (!jsonData || comparePortalVersions(data.metadata?.version, jsonData.metadata?.version) > 0)) {
-      console.info('Origem dos dados carregada: LocalStorage (versão mais nova)');
-      return data;
-    }
-  } catch (error) { console.warn('Os dados locais estão inválidos ou indisponíveis.', error); }
   if (jsonData) {
     console.info('Origem dos dados carregada: dados/ideias.json');
     return jsonData;
   }
+  try {
+    const stored = localStorage.getItem('programaIdeiasData');
+    const data = stored ? JSON.parse(stored) : null;
+    if (isUsablePortalData(data)) {
+      console.info('Origem dos dados carregada: LocalStorage (fallback)');
+      return data;
+    }
+  } catch (error) { console.warn('Os dados locais estão inválidos ou indisponíveis.', error); }
   console.error('Não foi possível carregar uma base de dados válida.');
   return PORTAL_FALLBACK;
 }
