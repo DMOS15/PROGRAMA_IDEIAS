@@ -69,6 +69,17 @@ function readRecognitionsBackup() {
     return null;
   }
 }
+function stableJsonValue(value) {
+  if (Array.isArray(value)) return value.map(stableJsonValue);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, stableJsonValue(value[key])]));
+  }
+  return value;
+}
+function sameRecognitionLists(left, right) {
+  return JSON.stringify(stableJsonValue(left?.reconhecidas || { trimestre: [], semestre: [] }))
+    === JSON.stringify(stableJsonValue(right?.reconhecidas || { trimestre: [], semestre: [] }));
+}
 async function loadPublishedData() {
   let publishedData = null;
   try {
@@ -79,17 +90,23 @@ async function loadPublishedData() {
   } catch (error) { console.info('[Administração] JSON publicado indisponível; verificando LocalStorage.', error); }
   const remoteData = publishedData;
   const stored = readStoredData(dataStorageKey);
-  const savedRecognitions = readRecognitionsBackup();
+  let savedRecognitions = readRecognitionsBackup();
+  if (savedRecognitions && remoteData && sameRecognitionLists(remoteData, { reconhecidas: savedRecognitions })) {
+    try { localStorage.removeItem(recognitionsBackupStorageKey); }
+    catch (error) { console.warn('[Reconhecimento] Não foi possível limpar o backup já publicado.', error); }
+    savedRecognitions = null;
+  }
   if (savedRecognitions) {
     const pendingBase = stored && (!remoteData || compareDataVersions(stored.metadata?.version, remoteData.metadata?.version) > 0) ? stored : remoteData || stored;
     if (pendingBase) {
+      const recognitionChangeIsStored = sameRecognitionLists(pendingBase, { reconhecidas: savedRecognitions });
       publishedData = {
         ...pendingBase,
         metadata: {
           ...pendingBase.metadata,
-          version: nextDataVersion(pendingBase.metadata?.version),
-          updatedAt: new Date().toISOString(),
-          updateReason: 'Alterações locais de reconhecimentos pendentes'
+          version: recognitionChangeIsStored ? pendingBase.metadata?.version : nextDataVersion(pendingBase.metadata?.version),
+          updatedAt: recognitionChangeIsStored ? pendingBase.metadata?.updatedAt : new Date().toISOString(),
+          updateReason: recognitionChangeIsStored ? pendingBase.metadata?.updateReason : 'Alterações locais de reconhecimentos pendentes'
         },
         reconhecidas: savedRecognitions
       };
@@ -115,11 +132,17 @@ async function loadAdminCurrentData() {
   if (local && (!published.data || compareDataVersions(local.metadata?.version, published.data.metadata?.version) > 0)) {
     const savedRecognitions = readRecognitionsBackup();
     if (!savedRecognitions) return { ...published, data: local, source: 'LocalStorage' };
+    const recognitionChangeIsStored = sameRecognitionLists(local, { reconhecidas: savedRecognitions });
     return {
       ...published,
       data: {
         ...local,
-        metadata: { ...local.metadata, version: nextDataVersion(local.metadata?.version), updatedAt: new Date().toISOString(), updateReason: 'Alterações locais de reconhecimentos pendentes' },
+        metadata: {
+          ...local.metadata,
+          version: recognitionChangeIsStored ? local.metadata?.version : nextDataVersion(local.metadata?.version),
+          updatedAt: recognitionChangeIsStored ? local.metadata?.updatedAt : new Date().toISOString(),
+          updateReason: recognitionChangeIsStored ? local.metadata?.updateReason : 'Alterações locais de reconhecimentos pendentes'
+        },
         reconhecidas: savedRecognitions
       },
       source: 'LocalStorage'
@@ -144,11 +167,6 @@ function encodeBase64Utf8(value) {
   let binary = '';
   for (let offset = 0; offset < bytes.length; offset += 0x8000) binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
   return btoa(binary);
-}
-async function githubResponseJson(response) {
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(payload.message || `GitHub respondeu HTTP ${response.status}.`);
-  return payload;
 }
 async function publishDatasetToGitHub(data, token) {
   const endpoint = `https://api.github.com/repos/${githubRepository.owner}/${githubRepository.name}/contents/${githubRepository.path}`;
@@ -715,7 +733,7 @@ admin$('#excel-upload').addEventListener('change', async (event) => {
       const cancelRows = cancelSheet ? XLSX.utils.sheet_to_json(cancelSheet, { defval: '', raw: false }) : [];
       const peopleRows = cadastroSheet ? XLSX.utils.sheet_to_json(cadastroSheet, { defval: '', raw: false }) : [];
       const dmosRows = dmosSheet ? XLSX.utils.sheet_to_json(dmosSheet, { defval: '', raw: false }) : [];
-      const ideiasPrincipais = ideaRows.map((row) => ({ numero: valueOf(row, ['Número', 'Numero']), descricaoCurta: valueOf(row, ['Descrição curta']), descricao: valueOf(row, ['Descrição', 'Descrição da dúvida']), status: valueOf(row, ['Status']), enviadoPor: valueOf(row, ['Enviado por']), subcategoria: valueOf(row, ['Subcategoria', 'Sub categoria']), criada: valueOf(row, ['Criada']), areaTrabalho: valueOf(row, ['Área de trabalho']), atualizado: valueOf(row, ['Atualizado']), atribuidoA: valueOf(row, ['Atribuído a', 'Atribuído']), grupoAtribuicao: valueOf(row, ['Grupo de atribuição']), fechado: valueOf(row, ['Fechado']), grupo: valueOf(row, ['Grupo']), autor: valueOf(row, ['Enviado por']) })).filter((idea) => ideaNumberKey(idea.numero));
+      const ideiasPrincipais = ideaRows.map((row) => ({ numero: valueOf(row, ['Número', 'Numero']), descricaoCurta: valueOf(row, ['Descrição curta']), descricao: valueOf(row, ['Descrição', 'Descrição da dúvida']), status: valueOf(row, ['Status']), enviadoPor: valueOf(row, ['Enviado por']), categoria: valueOf(row, ['Categoria']), subcategoria: valueOf(row, ['Subcategoria', 'Sub categoria']), criada: valueOf(row, ['Criada']), areaTrabalho: valueOf(row, ['Área de trabalho']), atualizado: valueOf(row, ['Atualizado']), atribuidoA: valueOf(row, ['Atribuído a', 'Atribuído']), grupoAtribuicao: valueOf(row, ['Grupo de atribuição']), fechado: valueOf(row, ['Fechado']), grupo: valueOf(row, ['Grupo']), autor: valueOf(row, ['Enviado por']) })).filter((idea) => ideaNumberKey(idea.numero));
       data = { metadata: { updatedAt: new Date().toISOString(), version: '1.0.0', updateReason: 'Upload via administração', updatedBy: 'Administração' }, cadastro: peopleRows.filter((row) => adminNormalize(valueOf(row, ['STATUS', 'Status'])) === 'ativo').map((row) => ({ nome: valueOf(row, ['NOME', 'Nome']), turno: valueOf(row, ['TURNO', 'Turno']), turnoComp: valueOf(row, ['TURNO COMP']), coordenador: valueOf(row, ['COORDENADOR', 'Coordenador']), funcao: valueOf(row, ['FUNÇÃO', 'Função']), status: valueOf(row, ['STATUS', 'Status']), area: valueOf(row, ['ÁREA', 'Área']) })), baseDmos: dmosRows.map((row) => ({ baseDmos: valueOf(row, ['Base DMOS']), nome: valueOf(row, ['NOME', 'Nome']), tipo: valueOf(row, ['TIPO', 'Tipo']), cargo: valueOf(row, ['CARGO', 'Cargo']), area: valueOf(row, ['AREA', 'Área']), coordenador: valueOf(row, ['COORDENADOR', 'Coordenador']) })), ideias: ideiasPrincipais, canceladas: cancelRows.map((row) => ({ numero: valueOf(row, ['Número', 'Numero']), motivo: valueOf(row, ['Descrição curta', 'Descrição', 'Motivo do cancelamento']) })).filter((row) => ideaNumberKey(row.numero)), reconhecidas: { trimestre: [], semestre: [] } };
     }
     if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('O arquivo não contém um objeto de dados válido.');
