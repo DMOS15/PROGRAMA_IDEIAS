@@ -1,1 +1,1 @@
-window.PORTAL_API_URL = '';
+window.PORTAL_API_URL = 'https://programaideias.vercel.app';

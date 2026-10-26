@@ -65,14 +65,18 @@ async function githubRequest(url, options = {}) {
 module.exports = async function publish(req, res) {
   const forwardedHost = req.headers['x-forwarded-host'] || req.headers.host;
   const apiOrigin = `${req.headers['x-forwarded-proto'] || 'https'}://${forwardedHost}`;
-  const allowedOrigin = process.env.FRONTEND_ORIGIN || apiOrigin;
+  const allowedOrigins = new Set([
+    apiOrigin,
+    'https://dmos15.github.io',
+    ...(process.env.FRONTEND_ORIGIN || '').split(',').map((origin) => origin.trim()).filter(Boolean)
+  ]);
   const requestOrigin = req.headers.origin;
 
   res.setHeader('Vary', 'Origin');
-  if (requestOrigin && requestOrigin !== allowedOrigin) {
+  if (requestOrigin && !allowedOrigins.has(requestOrigin)) {
     return sendJson(res, 403, { error: 'Origem não autorizada.' });
   }
-  res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
+  if (requestOrigin) res.setHeader('Access-Control-Allow-Origin', requestOrigin);
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Cache-Control', 'no-store');
