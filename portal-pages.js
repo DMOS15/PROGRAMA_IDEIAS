@@ -15,6 +15,7 @@ async function renderPerson2(personName, ideaNumber) {
 const PORTAL_FALLBACK = { cadastro: [], baseDmos: [], ideias: [], canceladas: [], reconhecidas: { trimestre: [], semestre: [] } };
 const pageState = { people: [], ideas: [], metadata: {}, portalData: PORTAL_FALLBACK };
 const page$ = (selector) => document.querySelector(selector);
+const page$all = (selector) => Array.from(document.querySelectorAll(selector));
 window.onerror = (message, source, line, column, error) => {
   console.error('[Portal] Erro JavaScript não tratado:', { message, source, line, column, error });
   const coordinatorContent = page$('#coordinator-content');
@@ -267,6 +268,81 @@ function renderCoordinatorCharts(dashboardData) {
     return '<div class="chart-card"><h3>Indicadores</h3><div class="empty-search">Os gráficos não puderam ser preparados.</div></div>';
   }
 }
+function buildCoordinatorIdeaRows(ideas, peopleByIdea) {
+  const getIdeaPerson = (idea) => peopleByIdea.get(String(idea.numero)) || null;
+  const sortMode = page$('#coord-team-sort')?.value || 'recentes';
+  const statusOrder = { 'Rascunho': 1, 'Em andamento': 2, 'Resolvido': 3, 'Fechado': 4, 'Cancelado': 5 };
+  const rows = [...ideas]
+    .map((idea) => ({ idea, person: getIdeaPerson(idea) }))
+    .filter(({ idea, person }) => idea && person)
+    .sort((left, right) => {
+      const leftDate = pageDateValue(left.idea.atualizado || left.idea.criada) || new Date(0);
+      const rightDate = pageDateValue(right.idea.atualizado || right.idea.criada) || new Date(0);
+      switch (sortMode) {
+        case 'antigas':
+          return leftDate - rightDate;
+        case 'numero':
+          return Number(right.idea.numero || 0) - Number(left.idea.numero || 0);
+        case 'status': {
+          const leftWeight = statusOrder[left.idea.status] ?? 99;
+          const rightWeight = statusOrder[right.idea.status] ?? 99;
+          if (leftWeight !== rightWeight) return leftWeight - rightWeight;
+          return String(left.idea.status || '').localeCompare(String(right.idea.status || ''), 'pt-BR');
+        }
+        case 'colaborador':
+          return String(left.person?.nome || '').localeCompare(String(right.person?.nome || ''), 'pt-BR');
+        case 'recentes':
+        default:
+          return rightDate - leftDate;
+      }
+    });
+  return rows.map(({ idea, person }) => `
+    <tr data-idea-number="${pageEsc(idea.numero)}" tabindex="0" role="button" aria-label="Abrir detalhes da ideia ${pageEsc(idea.numero)}">
+      <td><span class="idea-table-number">${pageEsc(idea.numero)}</span></td>
+      <td><div class="idea-table-title">${pageEsc(idea.descricaoCurta || 'Ideia sem título')}</div></td>
+      <td>${pageEsc(person?.nome || 'Não informado')}</td>
+      <td>${pageEsc(person?.coordenador || 'Não informado')}</td>
+      <td>${pageEsc(idea.areaTrabalho || idea.grupo || 'Não informado')}</td>
+      <td><span class="status-pill ${pageStatusClass(idea.status)}">${pageEsc(idea.status || 'Não informado')}</span></td>
+      <td>${pageEsc(idea.subcategoria || 'Não informado')}</td>
+      <td>${pageDate(idea.criada)}</td>
+      <td>${pageDate(idea.atualizado)}</td>
+    </tr>
+  `).join('');
+}
+function renderCoordinatorIdeaDetail(idea, person) {
+  const container = page$('#coord-team-detail');
+  if (!container) return;
+  const detailHtml = `
+    <div class="team-detail-header">
+      <div>
+        <span class="section-kicker">IDEIA</span>
+        <h3>${pageEsc(idea.numero)}</h3>
+      </div>
+      <button type="button" class="panel-close" aria-label="Fechar painel">×</button>
+    </div>
+    <div class="team-detail-content">
+      <h4>${pageEsc(idea.descricaoCurta || 'Ideia sem título')}</h4>
+      <div class="team-detail-grid">
+        <div><span>Descrição curta</span><strong>${pageEsc(idea.descricaoCurta || 'Não informado')}</strong></div>
+        <div><span>Descrição</span><p>${pageEsc(idea.descricao || idea.descricaoDuvida || 'Não informado')}</p></div>
+        <div><span>Colaborador</span><strong>${pageEsc(person?.nome || 'Não informado')}</strong></div>
+        <div><span>Líder</span><strong>${pageEsc(person?.coordenador || 'Não informado')}</strong></div>
+        <div><span>Área</span><strong>${pageEsc(idea.areaTrabalho || idea.grupo || 'Não informado')}</strong></div>
+        <div><span>Subcategoria</span><strong>${pageEsc(idea.subcategoria || 'Não informado')}</strong></div>
+        <div><span>Status</span><strong>${pageEsc(idea.status || 'Não informado')}</strong></div>
+        <div><span>Criada</span><strong>${pageDate(idea.criada)}</strong></div>
+        <div><span>Atualizada</span><strong>${pageDate(idea.atualizado)}</strong></div>
+        <div><span>Atribuído a</span><strong>${pageEsc(idea.atribuidoA || 'Não informado')}</strong></div>
+        <div><span>Grupo de atribuição</span><strong>${pageEsc(idea.grupoAtribuicao || 'Não informado')}</strong></div>
+      </div>
+    </div>
+  `;
+  container.innerHTML = detailHtml;
+  container.classList.remove('hidden');
+  const closeButton = container.querySelector('.panel-close');
+  if (closeButton) closeButton.addEventListener('click', () => container.classList.add('hidden'));
+}
 function renderCoordinatorDashboard() {
   try {
     const ideas = Array.isArray(pageState.ideas) ? pageState.ideas.filter((idea) => idea && typeof idea === 'object') : [];
@@ -282,7 +358,7 @@ function renderCoordinatorDashboard() {
     const content = page$('#coordinator-content');
     if (!content) throw new Error('Contêiner do dashboard de coordenadores não encontrado.');
     content.classList.remove('hidden');
-    content.innerHTML = `<div class="dashboard-header"><div><span class="section-kicker">VISÃO DOS LÍDERES</span><h1>Indicadores operacionais</h1><p>Dados consolidados após autenticação.</p></div></div><div class="coordinator-filters"><label>Área<select id="coord-area"><option value="Todos">Todas</option></select></label><label>Líder<select id="coord-coordinator"><option value="Todos">Todos</option></select></label><label>Status<select id="coord-status"><option value="Todos">Todos</option><option>Rascunho</option><option>Em andamento</option><option>Resolvido</option><option>Fechado</option><option>Cancelado</option></select></label><label>Subcategoria<select id="coord-subcategory"><option value="Todos">Todas</option></select></label><div id="coord-year-slicer"></div><div id="coord-month-slicer"></div></div><div class="dashboard-kpis"><div class="kpi"><span>Total de ideias</span><strong id="coord-total">0</strong></div><div class="kpi"><span>Implementadas</span><strong id="coord-implemented">0</strong></div><div class="kpi"><span>Canceladas</span><strong id="coord-cancelled">0</strong></div><div class="kpi"><span>Colaboradores ativos</span><strong id="coord-people">0</strong></div></div><div id="coord-charts" class="charts-row"></div>`;
+    content.innerHTML = `<div class="dashboard-header"><div><span class="section-kicker">VISÃO DOS LÍDERES</span><h1>Indicadores operacionais</h1><p>Dados consolidados após autenticação.</p></div></div><div class="coordinator-filters"><label>Área<select id="coord-area"><option value="Todos">Todas</option></select></label><label>Líder<select id="coord-coordinator"><option value="Todos">Todos</option></select></label><label>Status<select id="coord-status"><option value="Todos">Todos</option><option>Rascunho</option><option>Em andamento</option><option>Resolvido</option><option>Fechado</option><option>Cancelado</option></select></label><label>Subcategoria<select id="coord-subcategory"><option value="Todos">Todas</option></select></label><div id="coord-year-slicer"></div><div id="coord-month-slicer"></div></div><div class="dashboard-kpis"><div class="kpi"><span>Total de ideias</span><strong id="coord-total">0</strong></div><div class="kpi"><span>Implementadas</span><strong id="coord-implemented">0</strong></div><div class="kpi"><span>Canceladas</span><strong id="coord-cancelled">0</strong></div><div class="kpi"><span>Colaboradores ativos</span><strong id="coord-people">0</strong></div></div><div id="coord-team-section" class="team-section"><div class="team-header"><div><span class="section-kicker">IDEIAS DO TIME</span><h2>Visão operacional</h2></div><div class="team-header-tools"><select id="coord-team-sort"><option value="recentes">Mais recentes</option><option value="antigas">Mais antigas</option><option value="numero">Número</option><option value="status">Status</option><option value="colaborador">Colaborador</option></select><span id="coord-team-count" class="team-count">0 ideias</span></div></div><div class="status-shortcuts" aria-label="Atalhos de status"><button type="button" class="team-status-btn active" data-team-status="Todos">Todas</button><button type="button" class="team-status-btn" data-team-status="Rascunho">Rascunho</button><button type="button" class="team-status-btn" data-team-status="Em andamento">Em andamento</button><button type="button" class="team-status-btn" data-team-status="Resolvido">Resolvido</button><button type="button" class="team-status-btn" data-team-status="Fechado">Fechado</button><button type="button" class="team-status-btn" data-team-status="Cancelado">Cancelado</button></div><div class="team-table-wrapper"><table class="team-table"><thead><tr><th>Número</th><th>Descrição curta</th><th>Colaborador</th><th>Líder</th><th>Área</th><th>Status</th><th>Subcategoria</th><th>Criada</th><th>Atualizada</th></tr></thead><tbody id="coord-team-body"></tbody></table></div><aside id="coord-team-detail" class="coordinator-idea-panel hidden" aria-live="polite"></aside></div><div id="coord-charts" class="charts-row"></div>`;
     const addOptions = (selector, values) => {
       const select = page$(selector);
       [...new Set(values.map((value) => String(value ?? '').trim()).filter(Boolean))].sort((left, right) => left.localeCompare(right, 'pt-BR')).forEach((value) => {
@@ -300,6 +376,38 @@ function renderCoordinatorDashboard() {
     let updateDashboard = () => {};
     const yearSlicer = coordinatorMultiSelectSlicer(page$('#coord-year-slicer'), 'Ano', years, () => updateDashboard());
     const monthSlicer = coordinatorMultiSelectSlicer(page$('#coord-month-slicer'), 'Mês', coordinatorMonthOptions, () => updateDashboard());
+    const syncStatusButtons = () => {
+      const activeStatus = page$('#coord-status')?.value || 'Todos';
+      page$all('.team-status-btn').forEach((button) => {
+        const isActive = button.dataset.teamStatus === activeStatus;
+        button.classList.toggle('active', isActive);
+        button.setAttribute('aria-pressed', String(isActive));
+      });
+    };
+    const renderTeamIdeas = (filtered) => {
+      const tableBody = page$('#coord-team-body');
+      const countLabel = page$('#coord-team-count');
+      const teamDetail = page$('#coord-team-detail');
+      if (!tableBody || !countLabel) return;
+      const rows = buildCoordinatorIdeaRows(filtered, personByIdeaNumber);
+      tableBody.innerHTML = rows || '<tr class="empty-team-row"><td colspan="9">Nenhuma ideia encontrada para os filtros selecionados.</td></tr>';
+      countLabel.textContent = `${filtered.length} ${filtered.length === 1 ? 'ideia' : 'ideias'}`;
+      if (teamDetail) teamDetail.classList.add('hidden');
+      tableBody.querySelectorAll('tr[data-idea-number]').forEach((row) => {
+        row.addEventListener('click', () => {
+          const ideaNumber = String(row.dataset.ideaNumber || '');
+          const idea = filtered.find((entry) => String(entry.numero) === ideaNumber);
+          if (!idea) return;
+          renderCoordinatorIdeaDetail(idea, personByIdeaNumber.get(String(idea.numero)) || null);
+        });
+        row.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            row.click();
+          }
+        });
+      });
+    };
     updateDashboard = () => {
       try {
         const coordinatorFilter = page$('#coord-coordinator').value;
@@ -328,6 +436,8 @@ function renderCoordinatorDashboard() {
         page$('#coord-people').textContent = String(filteredPeople.length);
         page$('#coord-charts').innerHTML = renderCoordinatorCharts(buildCoordinatorDashboard(filtered, filteredPeople));
         page$('#coord-charts').querySelectorAll('.chart-rows').forEach((rows) => { rows.scrollTop = 0; });
+        renderTeamIdeas(filtered);
+        syncStatusButtons();
         console.log('Dados filtros:', filtered);
       } catch (error) {
         console.error('[Coordenadores] Falha ao atualizar filtros/indicadores.', error);
@@ -336,6 +446,16 @@ function renderCoordinatorDashboard() {
       }
     };
     ['#coord-area', '#coord-coordinator', '#coord-subcategory', '#coord-status'].forEach((selector) => page$(selector).addEventListener('change', updateDashboard));
+    page$('#coord-team-sort').addEventListener('change', updateDashboard);
+    page$all('.team-status-btn').forEach((button) => {
+      button.addEventListener('click', () => {
+        const status = button.dataset.teamStatus || 'Todos';
+        page$('#coord-status').value = status;
+        syncStatusButtons();
+        updateDashboard();
+      });
+    });
+    syncStatusButtons();
     updateDashboard();
   } catch (error) {
     console.error('[Coordenadores] Falha ao montar dashboard.', error);

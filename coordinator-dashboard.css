@@ -187,6 +187,222 @@
   text-transform: none;
 }
 
+#coordinator-content .team-section {
+  margin: 0 0 18px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: var(--shadow-soft, 0 10px 24px rgba(15, 23, 42, 0.04));
+}
+
+#coordinator-content .team-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+#coordinator-content .team-header h2 {
+  margin: 6px 0 0;
+  font-size: 22px;
+}
+
+#coordinator-content .team-header-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#coordinator-content .team-header-tools select {
+  min-height: 40px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 12px;
+}
+
+#coordinator-content .team-count {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+#coordinator-content .status-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+#coordinator-content .team-status-btn {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#coordinator-content .team-status-btn.active {
+  border-color: var(--teal);
+  background: rgba(20, 184, 166, 0.08);
+  color: var(--teal-dark, var(--teal));
+}
+
+#coordinator-content .team-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+}
+
+#coordinator-content .team-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+}
+
+#coordinator-content .team-table th,
+#coordinator-content .team-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  font-size: 12px;
+  vertical-align: top;
+}
+
+#coordinator-content .team-table th {
+  background: rgba(15, 23, 42, 0.02);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#coordinator-content .team-table tbody tr {
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+#coordinator-content .team-table tbody tr:hover,
+#coordinator-content .team-table tbody tr:focus-visible {
+  background: rgba(20, 184, 166, 0.04);
+  outline: none;
+}
+
+#coordinator-content .team-table .idea-table-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 54px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.04);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+#coordinator-content .idea-table-title {
+  max-width: 260px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+#coordinator-content .coordinator-idea-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(420px, 90vw);
+  height: 100vh;
+  padding: 20px;
+  border-left: 1px solid var(--line);
+  background: var(--white);
+  box-shadow: -18px 0 34px rgba(15, 23, 42, 0.12);
+  overflow-y: auto;
+  z-index: 50;
+}
+
+#coordinator-content .coordinator-idea-panel.hidden {
+  display: none;
+}
+
+#coordinator-content .team-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+#coordinator-content .team-detail-header h3 {
+  margin: 4px 0 0;
+  font-size: 26px;
+}
+
+#coordinator-content .panel-close {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  font-size: 24px;
+  cursor: pointer;
+}
+
+#coordinator-content .team-detail-content h4 {
+  margin: 0 0 16px;
+  font-size: 20px;
+  line-height: 1.3;
+}
+
+#coordinator-content .team-detail-grid {
+  display: grid;
+  gap: 12px;
+}
+
+#coordinator-content .team-detail-grid > div {
+  display: grid;
+  gap: 6px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+#coordinator-content .team-detail-grid span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#coordinator-content .team-detail-grid strong,
+#coordinator-content .team-detail-grid p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+#coordinator-content .empty-team-row td {
+  padding: 22px 12px;
+  color: var(--muted);
+  text-align: center;
+  font-weight: 600;
+}
+
 @media (max-width: 1100px) {
   #coordinator-content .dashboard-kpis {
     grid-template-columns: repeat(2, minmax(0, 1fr));
