@@ -188,6 +188,10 @@
 }
 
 #coordinator-content .team-section {
+  display: flex;
+  height: 620px;
+  box-sizing: border-box;
+  flex-direction: column;
   margin: 0 0 18px;
   padding: 18px;
   border: 1px solid var(--line);
@@ -261,7 +265,9 @@
 }
 
 #coordinator-content .team-table-wrapper {
-  overflow-x: auto;
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--white);
@@ -283,6 +289,9 @@
 }
 
 #coordinator-content .team-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   background: rgba(15, 23, 42, 0.02);
   color: var(--muted);
   font-size: 10px;
