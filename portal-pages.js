@@ -315,8 +315,12 @@ function renderCoordinatorDashboard() {
             && (!selectedYears || (created && selectedYears.has(String(created.getFullYear()))))
             && (!selectedMonths || (created && selectedMonths.has(String(created.getMonth() + 1))));
         });
-        const hasActiveFilters = page$('#coord-area').value !== 'Todos' || coordinatorFilter !== 'Todos' || page$('#coord-subcategory').value !== 'Todos' || page$('#coord-status').value !== 'Todos' || Boolean(selectedYears || selectedMonths);
-        const filteredPeople = hasActiveFilters ? [...new Set(filtered.map((idea) => personByIdeaNumber.get(String(idea.numero))).filter(Boolean))] : people;
+        const selectedArea = page$('#coord-area').value;
+        const activePeople = people.filter((person) => pageNormalize(person.status) === 'ativo');
+        const filteredPeople = activePeople.filter((person) =>
+          (selectedArea === 'Todos' || (person.area || 'Não informado') === selectedArea)
+          && (coordinatorFilter === 'Todos' || (person.coordenador || 'Não informado') === coordinatorFilter)
+        );
         const filteredCounts = coordinatorCountBy(filtered, (idea) => pageNormalize(idea.status));
         page$('#coord-total').textContent = String(filtered.length);
         page$('#coord-implemented').textContent = String((filteredCounts.fechado || 0) + (filteredCounts.resolvido || 0));
