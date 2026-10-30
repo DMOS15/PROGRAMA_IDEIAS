@@ -1,22 +1,22 @@
 {
   "metadata": {
-    "updatedAt": "2026-10-26T17:52:59.704Z",
-    "version": "1.0.8",
+    "updatedAt": "2026-10-30T17:23:49.810Z",
+    "version": "1.0.9",
     "updateReason": "Atualização da base de ideias",
     "updatedBy": "Administração",
-    "recordCount": 614,
+    "recordCount": 613,
     "uploadedBy": "Administração",
-    "sourceFile": "KPIS DASH - PROGRAMA DE IDEIAS (1).xlsx"
+    "sourceFile": "KPIS DASH - PROGRAMA DE IDEIAS.xlsx"
   },
   "cadastro": [
     {
-      "nome": "LETICIA APARECIDA TEODORO",
-      "turno": "0",
-      "turnoComp": "0 - ADM - ARTIGO 62 CLT I",
-      "coordenador": "DANIEL SERI",
-      "funcao": "COORDENADOR MELHORIA CONTINUA",
+      "nome": "ABNER BARROS DE PAIVA",
+      "turno": "3",
+      "turnoComp": "3º turno - 6x1 - 22:00 ás",
+      "coordenador": "LEONARDO ANTONIO FRANCELINO JUNIOR",
+      "funcao": "OPERADOR INDUSTRIAL I",
       "status": "ATIVO",
-      "area": "MELHORIA CONTINUA"
+      "area": "FABRIMA"
     },
     {
       "nome": "ALEX BARBARA",
@@ -28,15 +28,6 @@
       "area": "MANUTENÇÃO"
     },
     {
-      "nome": "DEUSMIRA MARIA FIGUEIREDO LIMA",
-      "turno": "2",
-      "turnoComp": "2º turno - 6x1 - 14:00 ás",
-      "coordenador": "CAIO GUILHERME SALES FERREIRA",
-      "funcao": "CONTROLADOR QUALIDADE",
-      "status": "ATIVO",
-      "area": "QUALIDADE"
-    },
-    {
       "nome": "ALEX SANDRO ALVES TEIXEIRA",
       "turno": "2",
       "turnoComp": "2º turno - 6x1 - 14:00 ás",
@@ -46,20 +37,20 @@
       "area": "MOINHO"
     },
     {
-      "nome": "ABNER BARROS DE PAIVA",
-      "turno": "3",
-      "turnoComp": "3º turno - 6x1 - 22:00 ás",
-      "coordenador": "LEONARDO ANTONIO FRANCELINO JUNIOR",
-      "funcao": "OPERADOR INDUSTRIAL I",
-      "status": "ATIVO",
-      "area": "FABRIMA"
-    },
-    {
       "nome": "ALEXANDRE BATISTA DE OLIVEIRA",
       "turno": "1",
       "turnoComp": "1º Turno - 6x2 06:00 - 14",
       "coordenador": "HENRIQUE MARTINS CARDOSO",
       "funcao": "TECNICO MECANICO III",
+      "status": "ATIVO",
+      "area": "MANUTENÇÃO"
+    },
+    {
+      "nome": "ALEXANDRE DE ASSIS DA COSTA",
+      "turno": "3",
+      "turnoComp": "3º Turno - 6x2 22:00 - 06",
+      "coordenador": "HENRIQUE MARTINS CARDOSO",
+      "funcao": "TECNICO MECANICO II",
       "status": "ATIVO",
       "area": "MANUTENÇÃO"
     },
@@ -80,6 +71,15 @@
       "funcao": "ASSISTENTE ADMINISTRATIVO",
       "status": "ATIVO",
       "area": "ALMOXARIFADO"
+    },
+    {
+      "nome": "ANA BEATRIZ LIMA SILVA",
+      "turno": "0",
+      "turnoComp": "0 - ADM - SEG/SEX 08:30 A",
+      "coordenador": "CAIO GUILHERME SALES FERREIRA",
+      "funcao": "ESTAGIARIO",
+      "status": "ATIVO",
+      "area": "QUALIDADE"
     },
     {
       "nome": "ANA CAROLLINE SIQUEIRA MARTINS",
@@ -112,7 +112,7 @@
       "nome": "ANA LUISA SOARES PEREIRA",
       "turno": "0",
       "turnoComp": "0 - ADM - SEG / SEX 08:00",
-      "coordenador": "SARAH FELICIO TEIXEIRA",
+      "coordenador": "DANIEL SERI",
       "funcao": "ANALISTA FACILITIES",
       "status": "ATIVO",
       "area": "FACILITIES"
@@ -125,6 +125,15 @@
       "funcao": "ANALISTA CONTROLE QUALIDADE JR",
       "status": "ATIVO",
       "area": "QUALIDADE"
+    },
+    {
+      "nome": "ANDERSON APARECIDO DO AMARAL",
+      "turno": "2",
+      "turnoComp": "2º turno - 6x1 - 14:00 ás",
+      "coordenador": "HENRIQUE MARTINS CARDOSO",
+      "funcao": "TECNICO ELETRONICO II",
+      "status": "ATIVO",
+      "area": "MANUTENÇÃO"
     },
     {
       "nome": "ANDERSON JOSE LUIZ SANTANA",
@@ -154,13 +163,13 @@
       "area": "MANUTENÇÃO ADM"
     },
     {
-      "nome": "ALEXANDRE DE ASSIS DA COSTA",
-      "turno": "3",
-      "turnoComp": "3º Turno - 6x2 22:00 - 06",
-      "coordenador": "HENRIQUE MARTINS CARDOSO",
-      "funcao": "TECNICO MECANICO II",
+      "nome": "ANGELA ALVES DOS SANTOS",
+      "turno": "1",
+      "turnoComp": "1º turno - 6x1 - 06:00 ás",
+      "coordenador": "RELTON FERREIRA DE MORAES",
+      "funcao": "OPERADOR INDUSTRIAL II",
       "status": "ATIVO",
-      "area": "MANUTENÇÃO"
+      "area": "FABRIMA"
     },
     {
       "nome": "ARTHUR FIGUEIREDO DA SILVA",
@@ -172,13 +181,13 @@
       "area": "MANUTENÇÃO"
     },
     {
-      "nome": "ANGELA ALVES DOS SANTOS",
-      "turno": "1",
-      "turnoComp": "1º turno - 6x1 - 06:00 ás",
-      "coordenador": "RELTON FERREIRA DE MORAES",
-      "funcao": "OPERADOR INDUSTRIAL II",
+      "nome": "BRUNO BARCELOS MELO RESENDE",
+      "turno": "3",
+      "turnoComp": "3º turno - 6x1 - 22:00 ás",
+      "coordenador": "SARAH FELICIO TEIXEIRA",
+      "funcao": "Almoxarife",
       "status": "ATIVO",
-      "area": "FABRIMA"
+      "area": "ALMOXARIFADO"
     },
     {
       "nome": "CAIO GUILHERME SALES FERREIRA",
@@ -226,15 +235,6 @@
       "area": "LOGÍSTICA"
     },
     {
-      "nome": "BRUNO BARCELOS MELO RESENDE",
-      "turno": "3",
-      "turnoComp": "3º turno - 6x1 - 22:00 ás",
-      "coordenador": "SARAH FELICIO TEIXEIRA",
-      "funcao": "Almoxarife",
-      "status": "ATIVO",
-      "area": "ALMOXARIFADO"
-    },
-    {
       "nome": "CARLOS INACIO PEREIRA DE SOUZA",
       "turno": "3",
       "turnoComp": "3º turno - 6x1 - 22:00 ás",
@@ -242,6 +242,15 @@
       "funcao": "OPERADOR INDUSTRIAL I",
       "status": "ATIVO",
       "area": "FABRIMA"
+    },
+    {
+      "nome": "DANIEL ALMEIDA MADUREIRA",
+      "turno": "3",
+      "turnoComp": "3º turno - 6x1 - 22:00 ás",
+      "coordenador": "MICHELLE APARECIDA FARIA",
+      "funcao": "OPERADOR INDUSTRIAL II",
+      "status": "ATIVO",
+      "area": "MOINHO"
     },
     {
       "nome": "DANIEL SERI",
@@ -257,7 +266,7 @@
       "turno": "1",
       "turnoComp": "1º turno - 6x1 - 06:00 ás",
       "coordenador": "RELTON FERREIRA DE MORAES",
-      "funcao": "OPERADOR INDUSTRIAL II",
+      "funcao": "OPERADOR INDUSTRIAL I",
       "status": "ATIVO",
       "area": "FABRIMA"
     },
@@ -271,13 +280,13 @@
       "area": "MOINHO"
     },
     {
-      "nome": "DANIEL ALMEIDA MADUREIRA",
-      "turno": "3",
-      "turnoComp": "3º turno - 6x1 - 22:00 ás",
-      "coordenador": "MICHELLE APARECIDA FARIA",
-      "funcao": "OPERADOR INDUSTRIAL II",
+      "nome": "DEUSMIRA MARIA FIGUEIREDO LIMA",
+      "turno": "2",
+      "turnoComp": "2º turno - 6x1 - 14:00 ás",
+      "coordenador": "CAIO GUILHERME SALES FERREIRA",
+      "funcao": "CONTROLADOR QUALIDADE",
       "status": "ATIVO",
-      "area": "MOINHO"
+      "area": "QUALIDADE"
     },
     {
       "nome": "DEYVIDSON CARLOS PERES DOS SANTOS",
@@ -289,6 +298,15 @@
       "area": "QUALIDADE"
     },
     {
+      "nome": "DIEGO ALMEIDA DOS SANTOS",
+      "turno": "H",
+      "turnoComp": "HIRE NOW",
+      "coordenador": "MICHELLE APARECIDA FARIA",
+      "funcao": "OPERADOR INDUSTRIAL I",
+      "status": "ATIVO",
+      "area": "CAFÉ VERDE"
+    },
+    {
       "nome": "DIEGO ANTONIO TERRA DE OLIVEIRA",
       "turno": "2",
       "turnoComp": "2º turno - 6x1 - 14:00 ás",
@@ -298,6 +316,15 @@
       "area": "LOGÍSTICA"
     },
     {
+      "nome": "EDILSON COIMBRA DE SOUZA",
+      "turno": "2",
+      "turnoComp": "2º turno - 6x1 - 14:00 ás",
+      "coordenador": "MICHELLE APARECIDA FARIA",
+      "funcao": "AUXILIAR DE CARGA E DESCARGA",
+      "status": "ATIVO",
+      "area": "CAFÉ VERDE"
+    },
+    {
       "nome": "EDNALDO LOPES DA SILVA",
       "turno": "2",
       "turnoComp": "2º Turno - 6x2 14:00 - 22",
@@ -305,6 +332,15 @@
       "funcao": "TECNICO MECANICO II",
       "status": "ATIVO",
       "area": "MANUTENÇÃO"
+    },
+    {
+      "nome": "EDUARDA FERREIRA MAXIMO",
+      "turno": "0",
+      "turnoComp": "0 - ADM - SEG/SEX 08:30 A",
+      "coordenador": "SEBASTIAO RODRIGUES BARBOSA DE CASTRO",
+      "funcao": "ESTAGIARIO",
+      "status": "ATIVO",
+      "area": "QUALIDADE"
     },
     {
       "nome": "EDUARDO LUIS CANDIDO",
@@ -341,6 +377,15 @@
       "funcao": "COORDENADOR MANUTENCAO SR",
       "status": "ATIVO",
       "area": "MANUTENÇÃO ADM"
+    },
+    {
+      "nome": "ELKER JUSCELINO GOULART",
+      "turno": "2",
+      "turnoComp": "2º Turno - 6x2 14:00 - 22",
+      "coordenador": "FABIO ASSIS DE OLIVEIRA",
+      "funcao": "OPERADOR LOGISTICO I",
+      "status": "ATIVO",
+      "area": "LOGÍSTICA"
     },
     {
       "nome": "FABIO ANTONIO DA SILVA SANTOS",
@@ -460,6 +505,15 @@
       "area": "QUALIDADE"
     },
     {
+      "nome": "HENRIQUE GABRIEL DE OLIVEIRA",
+      "turno": "1",
+      "turnoComp": "1º turno - 6x1 - 06:00 ás",
+      "coordenador": "RELTON FERREIRA DE MORAES",
+      "funcao": "AUXILIAR INDUSTRIAL",
+      "status": "ATIVO",
+      "area": "FABRIMA"
+    },
+    {
       "nome": "HENRIQUE MARTINS CARDOSO",
       "turno": "0",
       "turnoComp": "0- ADM- SEG/SEX 08:30 ÀS",
@@ -482,16 +536,25 @@
       "turno": "1",
       "turnoComp": "1º Turno - 6x2 06:00 - 14",
       "coordenador": "RELTON FERREIRA DE MORAES",
-      "funcao": "OPERADOR INDUSTRIAL I",
+      "funcao": "AUXILIAR INDUSTRIAL",
       "status": "ATIVO",
-      "area": "FABRIMA"
+      "area": "PKD"
+    },
+    {
+      "nome": "ISABELLA SILVA FERREIRA",
+      "turno": "0",
+      "turnoComp": "0 - ADM - SEG/TER/QUI/SEX",
+      "coordenador": "ELIEZER SILVA",
+      "funcao": "APRENDIZ",
+      "status": "ATIVO",
+      "area": "MANUTENÇÃO ADM"
     },
     {
       "nome": "ISAIAS SANTOS DE MACEDO",
-      "turno": "2",
-      "turnoComp": "2º turno - 6x1 - 14:00 ás",
-      "coordenador": "IZABELA CAROLINE PUGLIESI",
-      "funcao": "OPERADOR INDUSTRIAL II",
+      "turno": "1",
+      "turnoComp": "1º turno - 6x1 - 06:00 ás",
+      "coordenador": "RELTON FERREIRA DE MORAES",
+      "funcao": "OPERADOR INDUSTRIAL I",
       "status": "ATIVO",
       "area": "FABRIMA"
     },
@@ -530,6 +593,15 @@
       "funcao": "ESTAGIARIO",
       "status": "ATIVO",
       "area": "SHE"
+    },
+    {
+      "nome": "JOAO PEDRO ALVES RODRIGUES",
+      "turno": "2",
+      "turnoComp": "2º Turno - 6x2 14:00 - 22",
+      "coordenador": "MICHELLE APARECIDA FARIA",
+      "funcao": "OPERADOR INDUSTRIAL III",
+      "status": "ATIVO",
+      "area": "TORRADOR"
     },
     {
       "nome": "JOELMA APARECIDA INONE",
@@ -577,13 +649,22 @@
       "area": "MANUFATURA ADM"
     },
     {
+      "nome": "LETICIA APARECIDA TEODORO",
+      "turno": "0",
+      "turnoComp": "0 - ADM - ARTIGO 62 CLT I",
+      "coordenador": "DANIEL SERI",
+      "funcao": "COORDENADOR MELHORIA CONTINUA",
+      "status": "ATIVO",
+      "area": "MELHORIA CONTINUA"
+    },
+    {
       "nome": "LUCAS LOURENÇO SILVEIRA FERREIRA",
       "turno": "H",
       "turnoComp": "HIRE NOW",
       "coordenador": "LEONARDO ANTONIO FRANCELINO JUNIOR",
       "funcao": "AUXILIAR INDUSTRIAL",
       "status": "ATIVO",
-      "area": "PKD"
+      "area": "FABRIMA"
     },
     {
       "nome": "LUCAS SILVA CARVALHO",
@@ -593,6 +674,15 @@
       "funcao": "TECNICO MECANICO III",
       "status": "ATIVO",
       "area": "MANUTENÇÃO"
+    },
+    {
+      "nome": "LUIZ FELIPE DE SOUZA",
+      "turno": "H",
+      "turnoComp": "HIRE NOW",
+      "coordenador": "LEONARDO ANTONIO FRANCELINO JUNIOR",
+      "funcao": "OPERADOR INDUSTRIAL I",
+      "status": "ATIVO",
+      "area": "FABRIMA"
     },
     {
       "nome": "LUIZ HENRIQUE DA SILVA",
@@ -722,9 +812,9 @@
     },
     {
       "nome": "PATRICK DA SILVA PESSOA",
-      "turno": "3",
-      "turnoComp": "3º turno - 6x1 - 22:00 ás",
-      "coordenador": "LEONARDO ANTONIO FRANCELINO JUNIOR",
+      "turno": "1",
+      "turnoComp": "1º turno - 6x1 - 06:00 ás",
+      "coordenador": "RELTON FERREIRA DE MORAES",
       "funcao": "OPERADOR INDUSTRIAL II",
       "status": "ATIVO",
       "area": "PKD"
@@ -736,7 +826,7 @@
       "coordenador": "ELIEZER SILVA",
       "funcao": "Almoxarife de Manutencao",
       "status": "ATIVO",
-      "area": "MANUTENÇÃO ADM"
+      "area": "ALMOXARIFADO"
     },
     {
       "nome": "PEDRO HENRIQUE REZENDE SAMPAIO",
@@ -745,16 +835,25 @@
       "coordenador": "LEONARDO ANTONIO FRANCELINO JUNIOR",
       "funcao": "AUXILIAR INDUSTRIAL",
       "status": "ATIVO",
-      "area": "FABRIMA"
+      "area": "PKD"
     },
     {
       "nome": "RAFAEL DA SILVA SANTOS",
       "turno": "2",
       "turnoComp": "2º turno - 6x1 - 14:00 ás",
-      "coordenador": "MICHELLE APARECIDA FARIA",
-      "funcao": "OPERADOR INDUSTRIAL III",
+      "coordenador": "IZABELA CAROLINE PUGLIESI",
+      "funcao": "OPERADOR INDUSTRIAL II",
       "status": "ATIVO",
-      "area": "TORRADOR"
+      "area": "FABRIMA"
+    },
+    {
+      "nome": "RAFAEL OUTI DA SILVA",
+      "turno": "1",
+      "turnoComp": "1º turno - 6x1 - 06:00 ás",
+      "coordenador": "HENRIQUE MARTINS CARDOSO",
+      "funcao": "TECNICO ELETRONICO II",
+      "status": "ATIVO",
+      "area": "MANUTENÇÃO"
     },
     {
       "nome": "RAFAEL PEDRO SALGADO SOUZA",
@@ -851,7 +950,7 @@
       "turno": "0",
       "turnoComp": "0 - ADM - SEG / SEX - 08:",
       "coordenador": "CAIO GUILHERME SALES FERREIRA",
-      "funcao": "ANALISTA CONTROLE QUALIDADE PL",
+      "funcao": "Analista de Controle de Qualidade P",
       "status": "ATIVO",
       "area": "QUALIDADE"
     },
@@ -901,9 +1000,36 @@
       "area": "MANUFATURA ADM"
     },
     {
+      "nome": "VICTOR FRANCISCO OLIVEIRA NASCIMENTO",
+      "turno": "0",
+      "turnoComp": "0 - ADM - SEG/TER/QUI/SEX",
+      "coordenador": "CAIO GUILHERME SALES FERREIRA",
+      "funcao": "APRENDIZ",
+      "status": "ATIVO",
+      "area": "QUALIDADE"
+    },
+    {
+      "nome": "VICTOR RAPHAEL SANTOS SOUZA",
+      "turno": "0",
+      "turnoComp": "0 - ADM - SEG/SEX 08:30 A",
+      "coordenador": "LETICIA APARECIDA TEODORO",
+      "funcao": "ESTAGIARIO",
+      "status": "ATIVO",
+      "area": "MELHORIA CONTINUA"
+    },
+    {
       "nome": "VILBERT OLIVEIRA SANTOS",
       "turno": "3",
       "turnoComp": "3º Turno - 6x2 22:00 - 06",
+      "coordenador": "HENRIQUE MARTINS CARDOSO",
+      "funcao": "TECNICO MECANICO II",
+      "status": "ATIVO",
+      "area": "MANUTENÇÃO"
+    },
+    {
+      "nome": "VINICIUS DA COSTA ALEIXO",
+      "turno": "1",
+      "turnoComp": "1º Turno - 6x2 06:00 - 14",
       "coordenador": "HENRIQUE MARTINS CARDOSO",
       "funcao": "TECNICO MECANICO II",
       "status": "ATIVO",
@@ -914,9 +1040,9 @@
       "turno": "2",
       "turnoComp": "2º turno - 6x1 - 14:00 ás",
       "coordenador": "IZABELA CAROLINE PUGLIESI",
-      "funcao": "OPERADOR INDUSTRIAL II",
+      "funcao": "OPERADOR INDUSTRIAL I",
       "status": "ATIVO",
-      "area": "PKD"
+      "area": "FABRIMA"
     },
     {
       "nome": "VINICIUS RAMOS DE OLIVEIRA",
@@ -971,159 +1097,6 @@
       "funcao": "AUXILIAR INDUSTRIAL",
       "status": "ATIVO",
       "area": "FABRIMA"
-    },
-    {
-      "nome": "HENRIQUE GABRIEL DE OLIVEIRA",
-      "turno": "1",
-      "turnoComp": "1º turno - 6x1 - 06:00 ás",
-      "coordenador": "RELTON FERREIRA DE MORAES",
-      "funcao": "AUXILIAR INDUSTRIAL",
-      "status": "ATIVO",
-      "area": "FABRIMA"
-    },
-    {
-      "nome": "ANA BEATRIZ LIMA SILVA",
-      "turno": "0",
-      "turnoComp": "0 - ADM - SEG/SEX 08:30 A",
-      "coordenador": "CAIO GUILHERME SALES FERREIRA",
-      "funcao": "ESTAGIARIO",
-      "status": "ATIVO",
-      "area": "QUALIDADE"
-    },
-    {
-      "nome": "DIEGO ALMEIDA DOS SANTOS",
-      "turno": "H",
-      "turnoComp": "HIRE NOW",
-      "coordenador": "MICHELLE APARECIDA FARIA",
-      "funcao": "OPERADOR INDUSTRIAL I",
-      "status": "ATIVO",
-      "area": "CAFÉ VERDE"
-    },
-    {
-      "nome": "EDILSON COIMBRA DE SOUZA",
-      "turno": "2",
-      "turnoComp": "2º turno - 6x1 - 14:00 ás",
-      "coordenador": "MICHELLE APARECIDA FARIA",
-      "funcao": "AUXILIAR DE CARGA E DESCARGA",
-      "status": "ATIVO",
-      "area": "CAFÉ VERDE"
-    },
-    {
-      "nome": "VINICIUS DA COSTA ALEIXO",
-      "turno": "1",
-      "turnoComp": "1º Turno - 6x2 06:00 - 14",
-      "coordenador": "HENRIQUE MARTINS CARDOSO",
-      "funcao": "TECNICO MECANICO II",
-      "status": "ATIVO",
-      "area": "MANUTENÇÃO"
-    },
-    {
-      "nome": "ELKER JUSCELINO GOULART",
-      "turno": "2",
-      "turnoComp": "2º Turno - 6x2 14:00 - 22",
-      "coordenador": "FABIO ASSIS DE OLIVEIRA",
-      "funcao": "OPERADOR LOGISTICO I",
-      "status": "ATIVO",
-      "area": "LOGÍSTICA"
-    },
-    {
-      "nome": "JOAO PEDRO ALVES RODRIGUES",
-      "turno": "2",
-      "turnoComp": "2º Turno - 6x2 14:00 - 22",
-      "coordenador": "MICHELLE APARECIDA FARIA",
-      "funcao": "OPERADOR INDUSTRIAL III",
-      "status": "ATIVO",
-      "area": "TORRADOR"
-    },
-    {
-      "nome": "LUIZ FELIPE DE SOUZA",
-      "turno": "H",
-      "turnoComp": "HIRE NOW",
-      "coordenador": "MICHELLE APARECIDA FARIA",
-      "funcao": "OPERADOR INDUSTRIAL I",
-      "status": "ATIVO",
-      "area": "CAFÉ VERDE"
-    },
-    {
-      "nome": "ANDERSON APARECIDO DO AMARAL",
-      "turno": "2",
-      "turnoComp": "2º turno - 6x1 - 14:00 ás",
-      "coordenador": "HENRIQUE MARTINS CARDOSO",
-      "funcao": "TECNICO ELETRONICO II",
-      "status": "ATIVO",
-      "area": "MANUTENÇÃO"
-    },
-    {
-      "nome": "RAFAEL OUTI DA SILVA",
-      "turno": "1",
-      "turnoComp": "1º turno - 6x1 - 06:00 ás",
-      "coordenador": "HENRIQUE MARTINS CARDOSO",
-      "funcao": "TECNICO ELETRONICO II",
-      "status": "ATIVO",
-      "area": "MANUTENÇÃO"
-    },
-    {
-      "nome": "EDUARDA FERREIRA MAXIMO",
-      "turno": "0",
-      "turnoComp": "0 - ADM - SEG/SEX 08:30 A",
-      "coordenador": "SEBASTIAO RODRIGUES BARBOSA DE CASTRO",
-      "funcao": "ESTAGIARIO",
-      "status": "ATIVO",
-      "area": "QUALIDADE"
-    },
-    {
-      "nome": "ISABELLA SILVA FERREIRA",
-      "turno": "0",
-      "turnoComp": "0 - ADM - SEG/TER/QUI/SEX",
-      "coordenador": "ELIEZER SILVA",
-      "funcao": "APRENDIZ",
-      "status": "ATIVO",
-      "area": "MANUTENÇÃO ADM"
-    },
-    {
-      "nome": "VICTOR FRANCISCO OLIVEIRA NASCIMENTO",
-      "turno": "0",
-      "turnoComp": "0 - ADM - SEG/TER/QUI/SEX",
-      "coordenador": "CAIO GUILHERME SALES FERREIRA",
-      "funcao": "APRENDIZ",
-      "status": "ATIVO",
-      "area": "QUALIDADE"
-    },
-    {
-      "nome": "VICTOR RAPHAEL SANTOS SOUZA",
-      "turno": "0",
-      "turnoComp": "0 - ADM - SEG/SEX 08:30 A",
-      "coordenador": "LETICIA APARECIDA TEODORO",
-      "funcao": "ESTAGIARIO",
-      "status": "ATIVO",
-      "area": "MELHORIA CONTINUA"
-    },
-    {
-      "nome": "JOAO VITOR COSTA XAVIER",
-      "turno": "H",
-      "turnoComp": "HIRE NOW",
-      "coordenador": "GIOVANNA CRIPPA BIFFARATTE",
-      "funcao": "AUXILIAR INDUSTRIAL",
-      "status": "ATIVO",
-      "area": "FABRIMA"
-    },
-    {
-      "nome": "JAQUELINE NEVES FIGUEIREDO DE LIMA",
-      "turno": "H",
-      "turnoComp": "HIRE NOW",
-      "coordenador": "GIOVANNA CRIPPA BIFFARATTE",
-      "funcao": "AUXILIAR INDUSTRIAL",
-      "status": "ATIVO",
-      "area": "FABRIMA"
-    },
-    {
-      "nome": "LAURINALDO GAMA DA SILVA",
-      "turno": "3",
-      "turnoComp": "3º turno - 6x1 - 22:00 ás",
-      "coordenador": "FABIO ASSIS DE OLIVEIRA",
-      "funcao": "OPERADOR LOGISTICO I",
-      "status": "ATIVO",
-      "area": "LOGÍSTICA"
     }
   ],
   "baseDmos": [
@@ -3027,13 +3000,13 @@
       "numero": "FB0085628",
       "descricaoCurta": "melhoria procedimento quando arrebenta a alça do bag",
       "descricao": "quando arrebenta uma alça de bag hoje amarramos a alça com corda reaproveitada da caçamba do cavaco conforme foto. para melhorar a situação de segurança favor comprar uma cinta de 1.5m com capacidade 1500kg para está ser usada no alcamento do bag (considerando as outras 3 alças restante) Pedro Ferreira: Ideia apta para execução, mas é necessário que o orçamento seja enviado até CI, para que seja efetuada a compra.",
-      "status": "Resolvido",
+      "status": "Em andamento",
       "enviadoPor": "",
       "categoria": "Pequena mudança local",
       "subcategoria": "Safety - Health",
       "criada": "17-10-2024 09:05:39",
       "areaTrabalho": "01. CAFÉ CRU",
-      "atualizado": "05-10-2026 15:46:31",
+      "atualizado": "04-08-2026 14:38:08",
       "atribuidoA": "Flavia Silveira",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
@@ -8120,9 +8093,9 @@
       "subcategoria": "Qualidade",
       "criada": "16-10-2025 15:36:15",
       "areaTrabalho": "01. LINHA 01",
-      "atualizado": "05-10-2026 15:40:39",
-      "atribuidoA": "Leonardo Junior",
-      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "atualizado": "16-10-2025 15:40:30",
+      "atribuidoA": "",
+      "grupoAtribuicao": "IDEIAS-VACUO",
       "fechado": "",
       "grupo": "OPERAÇÃO",
       "autor": "Ivomar Costa"
@@ -8257,9 +8230,9 @@
       "subcategoria": "Processo",
       "criada": "28-10-2025 05:54:54",
       "areaTrabalho": "02. TORREFAÇÃO",
-      "atualizado": "05-10-2026 15:35:22",
-      "atribuidoA": "Flavia Silveira",
-      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "atualizado": "14-05-2026 15:59:37",
+      "atribuidoA": "Moises Costa",
+      "grupoAtribuicao": "IDEIAS-PROCESSOS",
       "fechado": "",
       "grupo": "OPERAÇÃO",
       "autor": "Edvan Santos"
@@ -9620,8 +9593,8 @@
       "subcategoria": "Cost (GE, rework)",
       "criada": "06-01-2026 18:03:05",
       "areaTrabalho": "05. LINHA 05",
-      "atualizado": "05-10-2026 15:19:49",
-      "atribuidoA": "Leonardo Junior",
+      "atualizado": "02-02-2026 15:47:33",
+      "atribuidoA": "Moises Costa",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "OPERAÇÃO",
@@ -10080,8 +10053,8 @@
       "subcategoria": "Processo",
       "criada": "13-02-2026 03:28:21",
       "areaTrabalho": "05. LINHA 05",
-      "atualizado": "05-10-2026 15:19:27",
-      "atribuidoA": "Leonardo Junior",
+      "atualizado": "16-04-2026 16:02:43",
+      "atribuidoA": "Moises Costa",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "OPERAÇÃO",
@@ -10694,8 +10667,8 @@
       "subcategoria": "Cost (GE, rework)",
       "criada": "14-04-2026 16:04:16",
       "areaTrabalho": "06. ADMINISTRATIVO",
-      "atualizado": "05-10-2026 15:02:43",
-      "atribuidoA": "Ana Pereira",
+      "atualizado": "17-09-2026 14:08:22",
+      "atribuidoA": "Jhonnathan Pereira",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "ADM/TÉCNICO/ASSISTENTE/ESTAG.",
@@ -10739,13 +10712,13 @@
       "numero": "FB0146658",
       "descricaoCurta": "Ferramenta para remoção de embalagens derretidas dos mordentes",
       "descricao": "Ideia para uma ferramenta para remoção de embalagens derretidas, possivelmente uma espátula um pouco mais espessa para que não se entorte. A referência seria uma parte de uma tesoura (abre a tesoura em dois pedaços e usa uma parte só).",
-      "status": "Resolvido",
+      "status": "Em andamento",
       "enviadoPor": "Isaias Macedo",
       "categoria": "Pequena mudança local",
       "subcategoria": "Cost (GE, rework)",
       "criada": "22-04-2026 13:14:00",
       "areaTrabalho": "04. LINHA 04",
-      "atualizado": "05-10-2026 15:07:39",
+      "atualizado": "27-05-2026 07:57:24",
       "atribuidoA": "Moises Costa",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
@@ -11063,13 +11036,13 @@
       "numero": "FB0151723",
       "descricaoCurta": "Troca dos vacometros da pkd",
       "descricao": "Criar um Padrão de vacometro para utilização na Pkd, os que foram instalados, estao com fita isolante para tampar um furo proveniente de uma valvula de posição que ele possuia, porem se soltava com a produção da maquina",
-      "status": "Resolvido",
+      "status": "Em andamento",
       "enviadoPor": "Arthur Silva",
       "categoria": "Pequena mudança local",
       "subcategoria": "Qualidade",
       "criada": "25-05-2026 12:38:10",
       "areaTrabalho": "01. LINHA 01",
-      "atualizado": "05-10-2026 10:08:13",
+      "atualizado": "30-06-2026 11:55:00",
       "atribuidoA": "Ana Martins",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
@@ -11239,8 +11212,8 @@
       "subcategoria": "Organisation of work",
       "criada": "04-06-2026 05:31:01",
       "areaTrabalho": "04. EMPACOTAMENTO",
-      "atualizado": "05-10-2026 15:00:16",
-      "atribuidoA": "Caio Ferreira",
+      "atualizado": "17-09-2026 14:04:16",
+      "atribuidoA": "Jhonnathan Pereira",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "OPERAÇÃO",
@@ -11290,9 +11263,9 @@
       "subcategoria": "Cost (GE, rework)",
       "criada": "09-06-2026 01:38:19",
       "areaTrabalho": "01. LINHA 01",
-      "atualizado": "05-10-2026 14:54:36",
-      "atribuidoA": "Victor Souza",
-      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "atualizado": "11-06-2026 14:39:37",
+      "atribuidoA": "Relton Moraes",
+      "grupoAtribuicao": "IDEIAS-VACUO",
       "fechado": "",
       "grupo": "OPERAÇÃO",
       "autor": "Fabricio Brant"
@@ -11546,29 +11519,12 @@
       "subcategoria": "Organisation of work",
       "criada": "22-06-2026 13:59:37",
       "areaTrabalho": "04. EMPACOTAMENTO",
-      "atualizado": "05-10-2026 09:22:06",
-      "atribuidoA": "Ana Luiza Paula",
+      "atualizado": "01-09-2026 12:19:32",
+      "atribuidoA": "Jhonnathan Pereira",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "OPERAÇÃO",
       "autor": "Edvaldo Silva"
-    },
-    {
-      "numero": "FB0127359",
-      "descricaoCurta": "teste",
-      "descricao": "teste",
-      "status": "Fechado",
-      "enviadoPor": "Jhonnathan Pereira",
-      "categoria": "Pequena mudança local",
-      "subcategoria": "Safety - Health",
-      "criada": "10-11-2025 08:44:23",
-      "areaTrabalho": "09.19 SALA DE PRODUTOS QUÍMICOS",
-      "atualizado": "19-01-2026 09:15:15",
-      "atribuidoA": "Jhonnathan Pereira",
-      "grupoAtribuicao": "IDEIAS-SHE",
-      "fechado": "",
-      "grupo": "ADM/TÉCNICO/ASSISTENTE/ESTAG.",
-      "autor": "Jhonnathan Pereira"
     },
     {
       "numero": "FB0155760",
@@ -11608,19 +11564,18 @@
       "numero": "FB0155992",
       "descricaoCurta": "Mudança de extintor",
       "descricao": "O extintor de incêndio, localizado ao lado do espaço de trabalho da Fabrízia, possui uma localização ruim que limita um pouco a chegada e fica numa área onde as pessoas costumam sentar para tratar temas com a BP. Existe um local próximo a TV que parece ideal para nova localização, onde já existe um ponto de hidrante para uso em uma possível situação de risco.",
-      "status": "Cancelado",
+      "status": "Em andamento",
       "enviadoPor": "Weverton Rodrigues",
       "categoria": "Pequena mudança local",
       "subcategoria": "Safety - Health",
       "criada": "23-06-2026 14:36:03",
       "areaTrabalho": "09.10 Escritórios administrativos",
-      "atualizado": "05-10-2026 14:51:23",
+      "atualizado": "14-07-2026 10:27:31",
       "atribuidoA": "Tiago Carvalho",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "ADM/TÉCNICO/ASSISTENTE/ESTAG.",
-      "autor": "Weverton Rodrigues",
-      "motivoCancelamento": "Mudança de extintor"
+      "autor": "Weverton Rodrigues"
     },
     {
       "numero": "FB0156112",
@@ -11847,13 +11802,13 @@
       "numero": "FB0157458",
       "descricaoCurta": "Caixa de carregador pra tablete café cru",
       "descricao": "Estalar uma caixinha de carregador para carregar o tablete do café cru",
-      "status": "Resolvido",
+      "status": "Em andamento",
       "enviadoPor": "Thais Souza",
       "categoria": "Pequena mudança local",
       "subcategoria": "Organisation of work",
       "criada": "02-07-2026 21:05:36",
       "areaTrabalho": "04. LINHA 04",
-      "atualizado": "05-10-2026 10:14:36",
+      "atualizado": "18-09-2026 09:50:35",
       "atribuidoA": "",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
@@ -11921,8 +11876,8 @@
       "subcategoria": "Yeld",
       "criada": "09-07-2026 09:38:43",
       "areaTrabalho": "04. EMPACOTAMENTO",
-      "atualizado": "05-10-2026 14:44:16",
-      "atribuidoA": "Izabela Pugliesi",
+      "atualizado": "14-07-2026 12:39:18",
+      "atribuidoA": "",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "OPERAÇÃO",
@@ -12629,19 +12584,18 @@
       "numero": "FB0166449",
       "descricaoCurta": "FAIXA DE PEDESTRES - LOGÍSTICA",
       "descricao": "Não existe uma faixa de pedestres no \"caminho da logística\", que é usado geralmente em dias de chuva de forma alternativa.",
-      "status": "Cancelado",
+      "status": "Em andamento",
       "enviadoPor": "Weverton Rodrigues",
       "categoria": "Pequena mudança local",
       "subcategoria": "Safety - Health",
       "criada": "10-09-2026 08:39:57",
       "areaTrabalho": "09.10 Escritórios administrativos",
-      "atualizado": "05-10-2026 15:32:44",
+      "atualizado": "17-09-2026 17:56:36",
       "atribuidoA": "",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "ADM/TÉCNICO/ASSISTENTE/ESTAG.",
-      "autor": "Weverton Rodrigues",
-      "motivoCancelamento": "FAIXA DE PEDESTRES - LOGÍSTICA"
+      "autor": "Weverton Rodrigues"
     },
     {
       "numero": "FB0167262",
@@ -12968,14 +12922,6 @@
     {
       "numero": "FB0087245",
       "motivo": "colocar as limpeza t3 cil"
-    },
-    {
-      "numero": "FB0166449",
-      "motivo": "FAIXA DE PEDESTRES - LOGÍSTICA"
-    },
-    {
-      "numero": "FB0155992",
-      "motivo": "Mudança de extintor"
     }
   ],
   "reconhecidas": {
@@ -12983,6 +12929,15 @@
     "semestre": []
   },
   "historicoAtualizacoes": [
+    {
+      "timestamp": "2026-10-30T17:23:49.810Z",
+      "file": "KPIS DASH - PROGRAMA DE IDEIAS.xlsx",
+      "reason": "Atualização da base de ideias",
+      "responsible": "Administração",
+      "ideas": 613,
+      "collaborators": 121,
+      "areas": 17
+    },
     {
       "timestamp": "2026-10-26T17:52:59.704Z",
       "file": "KPIS DASH - PROGRAMA DE IDEIAS (1).xlsx",
