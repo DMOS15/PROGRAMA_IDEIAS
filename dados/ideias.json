@@ -1,22 +1,22 @@
 {
   "metadata": {
-    "updatedAt": "2026-10-30T17:23:49.810Z",
-    "version": "1.0.9",
+    "updatedAt": "2026-10-30T18:33:34.185Z",
+    "version": "1.0.11",
     "updateReason": "Atualização da base de ideias",
     "updatedBy": "Administração",
-    "recordCount": 613,
+    "recordCount": 628,
     "uploadedBy": "Administração",
-    "sourceFile": "KPIS DASH - PROGRAMA DE IDEIAS.xlsx"
+    "sourceFile": "KPIS DASH - PROGRAMA DE IDEIAS (1).xlsx"
   },
   "cadastro": [
     {
-      "nome": "ABNER BARROS DE PAIVA",
-      "turno": "3",
-      "turnoComp": "3º turno - 6x1 - 22:00 ás",
-      "coordenador": "LEONARDO ANTONIO FRANCELINO JUNIOR",
-      "funcao": "OPERADOR INDUSTRIAL I",
+      "nome": "LETICIA APARECIDA TEODORO",
+      "turno": "0",
+      "turnoComp": "0 - ADM - ARTIGO 62 CLT I",
+      "coordenador": "DANIEL SERI",
+      "funcao": "COORDENADOR MELHORIA CONTINUA",
       "status": "ATIVO",
-      "area": "FABRIMA"
+      "area": "MELHORIA CONTINUA"
     },
     {
       "nome": "ALEX BARBARA",
@@ -28,6 +28,15 @@
       "area": "MANUTENÇÃO"
     },
     {
+      "nome": "DEUSMIRA MARIA FIGUEIREDO LIMA",
+      "turno": "2",
+      "turnoComp": "2º turno - 6x1 - 14:00 ás",
+      "coordenador": "CAIO GUILHERME SALES FERREIRA",
+      "funcao": "CONTROLADOR QUALIDADE",
+      "status": "ATIVO",
+      "area": "QUALIDADE"
+    },
+    {
       "nome": "ALEX SANDRO ALVES TEIXEIRA",
       "turno": "2",
       "turnoComp": "2º turno - 6x1 - 14:00 ás",
@@ -37,20 +46,20 @@
       "area": "MOINHO"
     },
     {
+      "nome": "ABNER BARROS DE PAIVA",
+      "turno": "3",
+      "turnoComp": "3º turno - 6x1 - 22:00 ás",
+      "coordenador": "LEONARDO ANTONIO FRANCELINO JUNIOR",
+      "funcao": "OPERADOR INDUSTRIAL I",
+      "status": "ATIVO",
+      "area": "FABRIMA"
+    },
+    {
       "nome": "ALEXANDRE BATISTA DE OLIVEIRA",
       "turno": "1",
       "turnoComp": "1º Turno - 6x2 06:00 - 14",
       "coordenador": "HENRIQUE MARTINS CARDOSO",
       "funcao": "TECNICO MECANICO III",
-      "status": "ATIVO",
-      "area": "MANUTENÇÃO"
-    },
-    {
-      "nome": "ALEXANDRE DE ASSIS DA COSTA",
-      "turno": "3",
-      "turnoComp": "3º Turno - 6x2 22:00 - 06",
-      "coordenador": "HENRIQUE MARTINS CARDOSO",
-      "funcao": "TECNICO MECANICO II",
       "status": "ATIVO",
       "area": "MANUTENÇÃO"
     },
@@ -71,15 +80,6 @@
       "funcao": "ASSISTENTE ADMINISTRATIVO",
       "status": "ATIVO",
       "area": "ALMOXARIFADO"
-    },
-    {
-      "nome": "ANA BEATRIZ LIMA SILVA",
-      "turno": "0",
-      "turnoComp": "0 - ADM - SEG/SEX 08:30 A",
-      "coordenador": "CAIO GUILHERME SALES FERREIRA",
-      "funcao": "ESTAGIARIO",
-      "status": "ATIVO",
-      "area": "QUALIDADE"
     },
     {
       "nome": "ANA CAROLLINE SIQUEIRA MARTINS",
@@ -112,7 +112,7 @@
       "nome": "ANA LUISA SOARES PEREIRA",
       "turno": "0",
       "turnoComp": "0 - ADM - SEG / SEX 08:00",
-      "coordenador": "DANIEL SERI",
+      "coordenador": "SARAH FELICIO TEIXEIRA",
       "funcao": "ANALISTA FACILITIES",
       "status": "ATIVO",
       "area": "FACILITIES"
@@ -125,15 +125,6 @@
       "funcao": "ANALISTA CONTROLE QUALIDADE JR",
       "status": "ATIVO",
       "area": "QUALIDADE"
-    },
-    {
-      "nome": "ANDERSON APARECIDO DO AMARAL",
-      "turno": "2",
-      "turnoComp": "2º turno - 6x1 - 14:00 ás",
-      "coordenador": "HENRIQUE MARTINS CARDOSO",
-      "funcao": "TECNICO ELETRONICO II",
-      "status": "ATIVO",
-      "area": "MANUTENÇÃO"
     },
     {
       "nome": "ANDERSON JOSE LUIZ SANTANA",
@@ -163,13 +154,13 @@
       "area": "MANUTENÇÃO ADM"
     },
     {
-      "nome": "ANGELA ALVES DOS SANTOS",
-      "turno": "1",
-      "turnoComp": "1º turno - 6x1 - 06:00 ás",
-      "coordenador": "RELTON FERREIRA DE MORAES",
-      "funcao": "OPERADOR INDUSTRIAL II",
+      "nome": "ALEXANDRE DE ASSIS DA COSTA",
+      "turno": "3",
+      "turnoComp": "3º Turno - 6x2 22:00 - 06",
+      "coordenador": "HENRIQUE MARTINS CARDOSO",
+      "funcao": "TECNICO MECANICO II",
       "status": "ATIVO",
-      "area": "FABRIMA"
+      "area": "MANUTENÇÃO"
     },
     {
       "nome": "ARTHUR FIGUEIREDO DA SILVA",
@@ -181,13 +172,13 @@
       "area": "MANUTENÇÃO"
     },
     {
-      "nome": "BRUNO BARCELOS MELO RESENDE",
-      "turno": "3",
-      "turnoComp": "3º turno - 6x1 - 22:00 ás",
-      "coordenador": "SARAH FELICIO TEIXEIRA",
-      "funcao": "Almoxarife",
+      "nome": "ANGELA ALVES DOS SANTOS",
+      "turno": "1",
+      "turnoComp": "1º turno - 6x1 - 06:00 ás",
+      "coordenador": "RELTON FERREIRA DE MORAES",
+      "funcao": "OPERADOR INDUSTRIAL II",
       "status": "ATIVO",
-      "area": "ALMOXARIFADO"
+      "area": "FABRIMA"
     },
     {
       "nome": "CAIO GUILHERME SALES FERREIRA",
@@ -235,6 +226,15 @@
       "area": "LOGÍSTICA"
     },
     {
+      "nome": "BRUNO BARCELOS MELO RESENDE",
+      "turno": "3",
+      "turnoComp": "3º turno - 6x1 - 22:00 ás",
+      "coordenador": "SARAH FELICIO TEIXEIRA",
+      "funcao": "Almoxarife",
+      "status": "ATIVO",
+      "area": "ALMOXARIFADO"
+    },
+    {
       "nome": "CARLOS INACIO PEREIRA DE SOUZA",
       "turno": "3",
       "turnoComp": "3º turno - 6x1 - 22:00 ás",
@@ -242,15 +242,6 @@
       "funcao": "OPERADOR INDUSTRIAL I",
       "status": "ATIVO",
       "area": "FABRIMA"
-    },
-    {
-      "nome": "DANIEL ALMEIDA MADUREIRA",
-      "turno": "3",
-      "turnoComp": "3º turno - 6x1 - 22:00 ás",
-      "coordenador": "MICHELLE APARECIDA FARIA",
-      "funcao": "OPERADOR INDUSTRIAL II",
-      "status": "ATIVO",
-      "area": "MOINHO"
     },
     {
       "nome": "DANIEL SERI",
@@ -266,7 +257,7 @@
       "turno": "1",
       "turnoComp": "1º turno - 6x1 - 06:00 ás",
       "coordenador": "RELTON FERREIRA DE MORAES",
-      "funcao": "OPERADOR INDUSTRIAL I",
+      "funcao": "OPERADOR INDUSTRIAL II",
       "status": "ATIVO",
       "area": "FABRIMA"
     },
@@ -280,13 +271,13 @@
       "area": "MOINHO"
     },
     {
-      "nome": "DEUSMIRA MARIA FIGUEIREDO LIMA",
-      "turno": "2",
-      "turnoComp": "2º turno - 6x1 - 14:00 ás",
-      "coordenador": "CAIO GUILHERME SALES FERREIRA",
-      "funcao": "CONTROLADOR QUALIDADE",
+      "nome": "DANIEL ALMEIDA MADUREIRA",
+      "turno": "3",
+      "turnoComp": "3º turno - 6x1 - 22:00 ás",
+      "coordenador": "MICHELLE APARECIDA FARIA",
+      "funcao": "OPERADOR INDUSTRIAL II",
       "status": "ATIVO",
-      "area": "QUALIDADE"
+      "area": "MOINHO"
     },
     {
       "nome": "DEYVIDSON CARLOS PERES DOS SANTOS",
@@ -298,15 +289,6 @@
       "area": "QUALIDADE"
     },
     {
-      "nome": "DIEGO ALMEIDA DOS SANTOS",
-      "turno": "H",
-      "turnoComp": "HIRE NOW",
-      "coordenador": "MICHELLE APARECIDA FARIA",
-      "funcao": "OPERADOR INDUSTRIAL I",
-      "status": "ATIVO",
-      "area": "CAFÉ VERDE"
-    },
-    {
       "nome": "DIEGO ANTONIO TERRA DE OLIVEIRA",
       "turno": "2",
       "turnoComp": "2º turno - 6x1 - 14:00 ás",
@@ -316,15 +298,6 @@
       "area": "LOGÍSTICA"
     },
     {
-      "nome": "EDILSON COIMBRA DE SOUZA",
-      "turno": "2",
-      "turnoComp": "2º turno - 6x1 - 14:00 ás",
-      "coordenador": "MICHELLE APARECIDA FARIA",
-      "funcao": "AUXILIAR DE CARGA E DESCARGA",
-      "status": "ATIVO",
-      "area": "CAFÉ VERDE"
-    },
-    {
       "nome": "EDNALDO LOPES DA SILVA",
       "turno": "2",
       "turnoComp": "2º Turno - 6x2 14:00 - 22",
@@ -332,15 +305,6 @@
       "funcao": "TECNICO MECANICO II",
       "status": "ATIVO",
       "area": "MANUTENÇÃO"
-    },
-    {
-      "nome": "EDUARDA FERREIRA MAXIMO",
-      "turno": "0",
-      "turnoComp": "0 - ADM - SEG/SEX 08:30 A",
-      "coordenador": "SEBASTIAO RODRIGUES BARBOSA DE CASTRO",
-      "funcao": "ESTAGIARIO",
-      "status": "ATIVO",
-      "area": "QUALIDADE"
     },
     {
       "nome": "EDUARDO LUIS CANDIDO",
@@ -377,15 +341,6 @@
       "funcao": "COORDENADOR MANUTENCAO SR",
       "status": "ATIVO",
       "area": "MANUTENÇÃO ADM"
-    },
-    {
-      "nome": "ELKER JUSCELINO GOULART",
-      "turno": "2",
-      "turnoComp": "2º Turno - 6x2 14:00 - 22",
-      "coordenador": "FABIO ASSIS DE OLIVEIRA",
-      "funcao": "OPERADOR LOGISTICO I",
-      "status": "ATIVO",
-      "area": "LOGÍSTICA"
     },
     {
       "nome": "FABIO ANTONIO DA SILVA SANTOS",
@@ -505,15 +460,6 @@
       "area": "QUALIDADE"
     },
     {
-      "nome": "HENRIQUE GABRIEL DE OLIVEIRA",
-      "turno": "1",
-      "turnoComp": "1º turno - 6x1 - 06:00 ás",
-      "coordenador": "RELTON FERREIRA DE MORAES",
-      "funcao": "AUXILIAR INDUSTRIAL",
-      "status": "ATIVO",
-      "area": "FABRIMA"
-    },
-    {
       "nome": "HENRIQUE MARTINS CARDOSO",
       "turno": "0",
       "turnoComp": "0- ADM- SEG/SEX 08:30 ÀS",
@@ -536,25 +482,16 @@
       "turno": "1",
       "turnoComp": "1º Turno - 6x2 06:00 - 14",
       "coordenador": "RELTON FERREIRA DE MORAES",
-      "funcao": "AUXILIAR INDUSTRIAL",
+      "funcao": "OPERADOR INDUSTRIAL I",
       "status": "ATIVO",
-      "area": "PKD"
-    },
-    {
-      "nome": "ISABELLA SILVA FERREIRA",
-      "turno": "0",
-      "turnoComp": "0 - ADM - SEG/TER/QUI/SEX",
-      "coordenador": "ELIEZER SILVA",
-      "funcao": "APRENDIZ",
-      "status": "ATIVO",
-      "area": "MANUTENÇÃO ADM"
+      "area": "FABRIMA"
     },
     {
       "nome": "ISAIAS SANTOS DE MACEDO",
-      "turno": "1",
-      "turnoComp": "1º turno - 6x1 - 06:00 ás",
-      "coordenador": "RELTON FERREIRA DE MORAES",
-      "funcao": "OPERADOR INDUSTRIAL I",
+      "turno": "2",
+      "turnoComp": "2º turno - 6x1 - 14:00 ás",
+      "coordenador": "IZABELA CAROLINE PUGLIESI",
+      "funcao": "OPERADOR INDUSTRIAL II",
       "status": "ATIVO",
       "area": "FABRIMA"
     },
@@ -593,15 +530,6 @@
       "funcao": "ESTAGIARIO",
       "status": "ATIVO",
       "area": "SHE"
-    },
-    {
-      "nome": "JOAO PEDRO ALVES RODRIGUES",
-      "turno": "2",
-      "turnoComp": "2º Turno - 6x2 14:00 - 22",
-      "coordenador": "MICHELLE APARECIDA FARIA",
-      "funcao": "OPERADOR INDUSTRIAL III",
-      "status": "ATIVO",
-      "area": "TORRADOR"
     },
     {
       "nome": "JOELMA APARECIDA INONE",
@@ -649,22 +577,13 @@
       "area": "MANUFATURA ADM"
     },
     {
-      "nome": "LETICIA APARECIDA TEODORO",
-      "turno": "0",
-      "turnoComp": "0 - ADM - ARTIGO 62 CLT I",
-      "coordenador": "DANIEL SERI",
-      "funcao": "COORDENADOR MELHORIA CONTINUA",
-      "status": "ATIVO",
-      "area": "MELHORIA CONTINUA"
-    },
-    {
       "nome": "LUCAS LOURENÇO SILVEIRA FERREIRA",
       "turno": "H",
       "turnoComp": "HIRE NOW",
       "coordenador": "LEONARDO ANTONIO FRANCELINO JUNIOR",
       "funcao": "AUXILIAR INDUSTRIAL",
       "status": "ATIVO",
-      "area": "FABRIMA"
+      "area": "PKD"
     },
     {
       "nome": "LUCAS SILVA CARVALHO",
@@ -674,15 +593,6 @@
       "funcao": "TECNICO MECANICO III",
       "status": "ATIVO",
       "area": "MANUTENÇÃO"
-    },
-    {
-      "nome": "LUIZ FELIPE DE SOUZA",
-      "turno": "H",
-      "turnoComp": "HIRE NOW",
-      "coordenador": "LEONARDO ANTONIO FRANCELINO JUNIOR",
-      "funcao": "OPERADOR INDUSTRIAL I",
-      "status": "ATIVO",
-      "area": "FABRIMA"
     },
     {
       "nome": "LUIZ HENRIQUE DA SILVA",
@@ -757,15 +667,6 @@
       "area": "LOGÍSTICA"
     },
     {
-      "nome": "MICHEL FELIPE DA SILVA PIO",
-      "turno": "2",
-      "turnoComp": "2º Turno - 6x2 14:00 - 22",
-      "coordenador": "FABIO ASSIS DE OLIVEIRA",
-      "funcao": "OPERADOR LOGISTICO I",
-      "status": "ATIVO",
-      "area": "LOGÍSTICA"
-    },
-    {
       "nome": "MICHELLE APARECIDA FARIA",
       "turno": "0",
       "turnoComp": "0 - ADM - ARTIGO 62 CLT I",
@@ -812,9 +713,9 @@
     },
     {
       "nome": "PATRICK DA SILVA PESSOA",
-      "turno": "1",
-      "turnoComp": "1º turno - 6x1 - 06:00 ás",
-      "coordenador": "RELTON FERREIRA DE MORAES",
+      "turno": "3",
+      "turnoComp": "3º turno - 6x1 - 22:00 ás",
+      "coordenador": "LEONARDO ANTONIO FRANCELINO JUNIOR",
       "funcao": "OPERADOR INDUSTRIAL II",
       "status": "ATIVO",
       "area": "PKD"
@@ -826,7 +727,7 @@
       "coordenador": "ELIEZER SILVA",
       "funcao": "Almoxarife de Manutencao",
       "status": "ATIVO",
-      "area": "ALMOXARIFADO"
+      "area": "MANUTENÇÃO ADM"
     },
     {
       "nome": "PEDRO HENRIQUE REZENDE SAMPAIO",
@@ -835,25 +736,16 @@
       "coordenador": "LEONARDO ANTONIO FRANCELINO JUNIOR",
       "funcao": "AUXILIAR INDUSTRIAL",
       "status": "ATIVO",
-      "area": "PKD"
+      "area": "FABRIMA"
     },
     {
       "nome": "RAFAEL DA SILVA SANTOS",
       "turno": "2",
       "turnoComp": "2º turno - 6x1 - 14:00 ás",
-      "coordenador": "IZABELA CAROLINE PUGLIESI",
-      "funcao": "OPERADOR INDUSTRIAL II",
+      "coordenador": "MICHELLE APARECIDA FARIA",
+      "funcao": "OPERADOR INDUSTRIAL III",
       "status": "ATIVO",
-      "area": "FABRIMA"
-    },
-    {
-      "nome": "RAFAEL OUTI DA SILVA",
-      "turno": "1",
-      "turnoComp": "1º turno - 6x1 - 06:00 ás",
-      "coordenador": "HENRIQUE MARTINS CARDOSO",
-      "funcao": "TECNICO ELETRONICO II",
-      "status": "ATIVO",
-      "area": "MANUTENÇÃO"
+      "area": "TORRADOR"
     },
     {
       "nome": "RAFAEL PEDRO SALGADO SOUZA",
@@ -950,7 +842,7 @@
       "turno": "0",
       "turnoComp": "0 - ADM - SEG / SEX - 08:",
       "coordenador": "CAIO GUILHERME SALES FERREIRA",
-      "funcao": "Analista de Controle de Qualidade P",
+      "funcao": "ANALISTA CONTROLE QUALIDADE PL",
       "status": "ATIVO",
       "area": "QUALIDADE"
     },
@@ -1000,36 +892,9 @@
       "area": "MANUFATURA ADM"
     },
     {
-      "nome": "VICTOR FRANCISCO OLIVEIRA NASCIMENTO",
-      "turno": "0",
-      "turnoComp": "0 - ADM - SEG/TER/QUI/SEX",
-      "coordenador": "CAIO GUILHERME SALES FERREIRA",
-      "funcao": "APRENDIZ",
-      "status": "ATIVO",
-      "area": "QUALIDADE"
-    },
-    {
-      "nome": "VICTOR RAPHAEL SANTOS SOUZA",
-      "turno": "0",
-      "turnoComp": "0 - ADM - SEG/SEX 08:30 A",
-      "coordenador": "LETICIA APARECIDA TEODORO",
-      "funcao": "ESTAGIARIO",
-      "status": "ATIVO",
-      "area": "MELHORIA CONTINUA"
-    },
-    {
       "nome": "VILBERT OLIVEIRA SANTOS",
       "turno": "3",
       "turnoComp": "3º Turno - 6x2 22:00 - 06",
-      "coordenador": "HENRIQUE MARTINS CARDOSO",
-      "funcao": "TECNICO MECANICO II",
-      "status": "ATIVO",
-      "area": "MANUTENÇÃO"
-    },
-    {
-      "nome": "VINICIUS DA COSTA ALEIXO",
-      "turno": "1",
-      "turnoComp": "1º Turno - 6x2 06:00 - 14",
       "coordenador": "HENRIQUE MARTINS CARDOSO",
       "funcao": "TECNICO MECANICO II",
       "status": "ATIVO",
@@ -1040,9 +905,9 @@
       "turno": "2",
       "turnoComp": "2º turno - 6x1 - 14:00 ás",
       "coordenador": "IZABELA CAROLINE PUGLIESI",
-      "funcao": "OPERADOR INDUSTRIAL I",
+      "funcao": "OPERADOR INDUSTRIAL II",
       "status": "ATIVO",
-      "area": "FABRIMA"
+      "area": "PKD"
     },
     {
       "nome": "VINICIUS RAMOS DE OLIVEIRA",
@@ -1094,6 +959,168 @@
       "turno": "2",
       "turnoComp": "2º turno - 6x1 - 14:00 ás",
       "coordenador": "IZABELA CAROLINE PUGLIESI",
+      "funcao": "AUXILIAR INDUSTRIAL",
+      "status": "ATIVO",
+      "area": "FABRIMA"
+    },
+    {
+      "nome": "HENRIQUE GABRIEL DE OLIVEIRA",
+      "turno": "1",
+      "turnoComp": "1º turno - 6x1 - 06:00 ás",
+      "coordenador": "RELTON FERREIRA DE MORAES",
+      "funcao": "AUXILIAR INDUSTRIAL",
+      "status": "ATIVO",
+      "area": "FABRIMA"
+    },
+    {
+      "nome": "ANA BEATRIZ LIMA SILVA",
+      "turno": "0",
+      "turnoComp": "0 - ADM - SEG/SEX 08:30 A",
+      "coordenador": "CAIO GUILHERME SALES FERREIRA",
+      "funcao": "ESTAGIARIO",
+      "status": "ATIVO",
+      "area": "QUALIDADE"
+    },
+    {
+      "nome": "DIEGO ALMEIDA DOS SANTOS",
+      "turno": "H",
+      "turnoComp": "HIRE NOW",
+      "coordenador": "MICHELLE APARECIDA FARIA",
+      "funcao": "OPERADOR INDUSTRIAL I",
+      "status": "ATIVO",
+      "area": "CAFÉ VERDE"
+    },
+    {
+      "nome": "EDILSON COIMBRA DE SOUZA",
+      "turno": "2",
+      "turnoComp": "2º turno - 6x1 - 14:00 ás",
+      "coordenador": "MICHELLE APARECIDA FARIA",
+      "funcao": "AUXILIAR DE CARGA E DESCARGA",
+      "status": "ATIVO",
+      "area": "CAFÉ VERDE"
+    },
+    {
+      "nome": "VINICIUS DA COSTA ALEIXO",
+      "turno": "1",
+      "turnoComp": "1º Turno - 6x2 06:00 - 14",
+      "coordenador": "HENRIQUE MARTINS CARDOSO",
+      "funcao": "TECNICO MECANICO II",
+      "status": "ATIVO",
+      "area": "MANUTENÇÃO"
+    },
+    {
+      "nome": "ELKER JUSCELINO GOULART",
+      "turno": "2",
+      "turnoComp": "2º Turno - 6x2 14:00 - 22",
+      "coordenador": "FABIO ASSIS DE OLIVEIRA",
+      "funcao": "OPERADOR LOGISTICO I",
+      "status": "ATIVO",
+      "area": "LOGÍSTICA"
+    },
+    {
+      "nome": "JOAO PEDRO ALVES RODRIGUES",
+      "turno": "2",
+      "turnoComp": "2º Turno - 6x2 14:00 - 22",
+      "coordenador": "MICHELLE APARECIDA FARIA",
+      "funcao": "OPERADOR INDUSTRIAL III",
+      "status": "ATIVO",
+      "area": "TORRADOR"
+    },
+    {
+      "nome": "LUIZ FELIPE DE SOUZA",
+      "turno": "H",
+      "turnoComp": "HIRE NOW",
+      "coordenador": "MICHELLE APARECIDA FARIA",
+      "funcao": "OPERADOR INDUSTRIAL I",
+      "status": "ATIVO",
+      "area": "CAFÉ VERDE"
+    },
+    {
+      "nome": "ANDERSON APARECIDO DO AMARAL",
+      "turno": "2",
+      "turnoComp": "2º turno - 6x1 - 14:00 ás",
+      "coordenador": "HENRIQUE MARTINS CARDOSO",
+      "funcao": "TECNICO ELETRONICO II",
+      "status": "ATIVO",
+      "area": "MANUTENÇÃO"
+    },
+    {
+      "nome": "RAFAEL OUTI DA SILVA",
+      "turno": "1",
+      "turnoComp": "1º turno - 6x1 - 06:00 ás",
+      "coordenador": "HENRIQUE MARTINS CARDOSO",
+      "funcao": "TECNICO ELETRONICO II",
+      "status": "ATIVO",
+      "area": "MANUTENÇÃO"
+    },
+    {
+      "nome": "EDUARDA FERREIRA MAXIMO",
+      "turno": "0",
+      "turnoComp": "0 - ADM - SEG/SEX 08:30 A",
+      "coordenador": "SEBASTIAO RODRIGUES BARBOSA DE CASTRO",
+      "funcao": "ESTAGIARIO",
+      "status": "ATIVO",
+      "area": "QUALIDADE"
+    },
+    {
+      "nome": "ISABELLA SILVA FERREIRA",
+      "turno": "0",
+      "turnoComp": "0 - ADM - SEG/TER/QUI/SEX",
+      "coordenador": "ELIEZER SILVA",
+      "funcao": "APRENDIZ",
+      "status": "ATIVO",
+      "area": "MANUTENÇÃO ADM"
+    },
+    {
+      "nome": "VICTOR FRANCISCO OLIVEIRA NASCIMENTO",
+      "turno": "0",
+      "turnoComp": "0 - ADM - SEG/TER/QUI/SEX",
+      "coordenador": "CAIO GUILHERME SALES FERREIRA",
+      "funcao": "APRENDIZ",
+      "status": "ATIVO",
+      "area": "QUALIDADE"
+    },
+    {
+      "nome": "VICTOR RAPHAEL SANTOS SOUZA",
+      "turno": "0",
+      "turnoComp": "0 - ADM - SEG/SEX 08:30 A",
+      "coordenador": "LETICIA APARECIDA TEODORO",
+      "funcao": "ESTAGIARIO",
+      "status": "ATIVO",
+      "area": "MELHORIA CONTINUA"
+    },
+    {
+      "nome": "JOAO VITOR COSTA XAVIER",
+      "turno": "H",
+      "turnoComp": "HIRE NOW",
+      "coordenador": "GIOVANNA CRIPPA BIFFARATTE",
+      "funcao": "AUXILIAR INDUSTRIAL",
+      "status": "ATIVO",
+      "area": "FABRIMA"
+    },
+    {
+      "nome": "JAQUELINE NEVES FIGUEIREDO DE LIMA",
+      "turno": "H",
+      "turnoComp": "HIRE NOW",
+      "coordenador": "GIOVANNA CRIPPA BIFFARATTE",
+      "funcao": "AUXILIAR INDUSTRIAL",
+      "status": "ATIVO",
+      "area": "FABRIMA"
+    },
+    {
+      "nome": "LAURINALDO GAMA DA SILVA",
+      "turno": "3",
+      "turnoComp": "3º turno - 6x1 - 22:00 ás",
+      "coordenador": "FABIO ASSIS DE OLIVEIRA",
+      "funcao": "OPERADOR LOGISTICO I",
+      "status": "ATIVO",
+      "area": "LOGÍSTICA"
+    },
+    {
+      "nome": "GLAUCIURI RODRIGUES DE SENA",
+      "turno": "H",
+      "turnoComp": "HIRE NOW",
+      "coordenador": "LEONARDO ANTONIO FRANCELINO JUNIOR",
       "funcao": "AUXILIAR INDUSTRIAL",
       "status": "ATIVO",
       "area": "FABRIMA"
@@ -3000,13 +3027,13 @@
       "numero": "FB0085628",
       "descricaoCurta": "melhoria procedimento quando arrebenta a alça do bag",
       "descricao": "quando arrebenta uma alça de bag hoje amarramos a alça com corda reaproveitada da caçamba do cavaco conforme foto. para melhorar a situação de segurança favor comprar uma cinta de 1.5m com capacidade 1500kg para está ser usada no alcamento do bag (considerando as outras 3 alças restante) Pedro Ferreira: Ideia apta para execução, mas é necessário que o orçamento seja enviado até CI, para que seja efetuada a compra.",
-      "status": "Em andamento",
+      "status": "Resolvido",
       "enviadoPor": "",
       "categoria": "Pequena mudança local",
       "subcategoria": "Safety - Health",
       "criada": "17-10-2024 09:05:39",
       "areaTrabalho": "01. CAFÉ CRU",
-      "atualizado": "04-08-2026 14:38:08",
+      "atualizado": "05-10-2026 15:46:31",
       "atribuidoA": "Flavia Silveira",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
@@ -8093,9 +8120,9 @@
       "subcategoria": "Qualidade",
       "criada": "16-10-2025 15:36:15",
       "areaTrabalho": "01. LINHA 01",
-      "atualizado": "16-10-2025 15:40:30",
-      "atribuidoA": "",
-      "grupoAtribuicao": "IDEIAS-VACUO",
+      "atualizado": "05-10-2026 15:40:39",
+      "atribuidoA": "Leonardo Junior",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "OPERAÇÃO",
       "autor": "Ivomar Costa"
@@ -8230,9 +8257,9 @@
       "subcategoria": "Processo",
       "criada": "28-10-2025 05:54:54",
       "areaTrabalho": "02. TORREFAÇÃO",
-      "atualizado": "14-05-2026 15:59:37",
-      "atribuidoA": "Moises Costa",
-      "grupoAtribuicao": "IDEIAS-PROCESSOS",
+      "atualizado": "05-10-2026 15:35:22",
+      "atribuidoA": "Flavia Silveira",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "OPERAÇÃO",
       "autor": "Edvan Santos"
@@ -9313,13 +9340,13 @@
       "numero": "FB0131272",
       "descricaoCurta": "GANCHOS PARA CAPA DE CHUVA",
       "descricao": "Instalar próximo a prateleira de capacetes, ganchos para pendurar capas de chuva.",
-      "status": "Em andamento",
+      "status": "Resolvido",
       "enviadoPor": "Aline Fernandes",
       "categoria": "Pequena mudança local",
       "subcategoria": "Organisation of work",
       "criada": "11-12-2025 09:41:10",
       "areaTrabalho": "06. ADMINISTRATIVO",
-      "atualizado": "03-07-2026 11:06:59",
+      "atualizado": "29-10-2026 13:52:42",
       "atribuidoA": "",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
@@ -9593,8 +9620,8 @@
       "subcategoria": "Cost (GE, rework)",
       "criada": "06-01-2026 18:03:05",
       "areaTrabalho": "05. LINHA 05",
-      "atualizado": "02-02-2026 15:47:33",
-      "atribuidoA": "Moises Costa",
+      "atualizado": "05-10-2026 15:19:49",
+      "atribuidoA": "Leonardo Junior",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "OPERAÇÃO",
@@ -10053,8 +10080,8 @@
       "subcategoria": "Processo",
       "criada": "13-02-2026 03:28:21",
       "areaTrabalho": "05. LINHA 05",
-      "atualizado": "16-04-2026 16:02:43",
-      "atribuidoA": "Moises Costa",
+      "atualizado": "05-10-2026 15:19:27",
+      "atribuidoA": "Leonardo Junior",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "OPERAÇÃO",
@@ -10667,8 +10694,8 @@
       "subcategoria": "Cost (GE, rework)",
       "criada": "14-04-2026 16:04:16",
       "areaTrabalho": "06. ADMINISTRATIVO",
-      "atualizado": "17-09-2026 14:08:22",
-      "atribuidoA": "Jhonnathan Pereira",
+      "atualizado": "05-10-2026 15:02:43",
+      "atribuidoA": "Ana Pereira",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "ADM/TÉCNICO/ASSISTENTE/ESTAG.",
@@ -10712,13 +10739,13 @@
       "numero": "FB0146658",
       "descricaoCurta": "Ferramenta para remoção de embalagens derretidas dos mordentes",
       "descricao": "Ideia para uma ferramenta para remoção de embalagens derretidas, possivelmente uma espátula um pouco mais espessa para que não se entorte. A referência seria uma parte de uma tesoura (abre a tesoura em dois pedaços e usa uma parte só).",
-      "status": "Em andamento",
+      "status": "Resolvido",
       "enviadoPor": "Isaias Macedo",
       "categoria": "Pequena mudança local",
       "subcategoria": "Cost (GE, rework)",
       "criada": "22-04-2026 13:14:00",
       "areaTrabalho": "04. LINHA 04",
-      "atualizado": "27-05-2026 07:57:24",
+      "atualizado": "05-10-2026 15:07:39",
       "atribuidoA": "Moises Costa",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
@@ -11036,13 +11063,13 @@
       "numero": "FB0151723",
       "descricaoCurta": "Troca dos vacometros da pkd",
       "descricao": "Criar um Padrão de vacometro para utilização na Pkd, os que foram instalados, estao com fita isolante para tampar um furo proveniente de uma valvula de posição que ele possuia, porem se soltava com a produção da maquina",
-      "status": "Em andamento",
+      "status": "Resolvido",
       "enviadoPor": "Arthur Silva",
       "categoria": "Pequena mudança local",
       "subcategoria": "Qualidade",
       "criada": "25-05-2026 12:38:10",
       "areaTrabalho": "01. LINHA 01",
-      "atualizado": "30-06-2026 11:55:00",
+      "atualizado": "05-10-2026 10:08:13",
       "atribuidoA": "Ana Martins",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
@@ -11212,8 +11239,8 @@
       "subcategoria": "Organisation of work",
       "criada": "04-06-2026 05:31:01",
       "areaTrabalho": "04. EMPACOTAMENTO",
-      "atualizado": "17-09-2026 14:04:16",
-      "atribuidoA": "Jhonnathan Pereira",
+      "atualizado": "05-10-2026 15:00:16",
+      "atribuidoA": "Caio Ferreira",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "OPERAÇÃO",
@@ -11263,9 +11290,9 @@
       "subcategoria": "Cost (GE, rework)",
       "criada": "09-06-2026 01:38:19",
       "areaTrabalho": "01. LINHA 01",
-      "atualizado": "11-06-2026 14:39:37",
-      "atribuidoA": "Relton Moraes",
-      "grupoAtribuicao": "IDEIAS-VACUO",
+      "atualizado": "05-10-2026 14:54:36",
+      "atribuidoA": "Victor Souza",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "OPERAÇÃO",
       "autor": "Fabricio Brant"
@@ -11519,8 +11546,8 @@
       "subcategoria": "Organisation of work",
       "criada": "22-06-2026 13:59:37",
       "areaTrabalho": "04. EMPACOTAMENTO",
-      "atualizado": "01-09-2026 12:19:32",
-      "atribuidoA": "Jhonnathan Pereira",
+      "atualizado": "05-10-2026 09:22:06",
+      "atribuidoA": "Ana Luiza Paula",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "OPERAÇÃO",
@@ -11564,18 +11591,19 @@
       "numero": "FB0155992",
       "descricaoCurta": "Mudança de extintor",
       "descricao": "O extintor de incêndio, localizado ao lado do espaço de trabalho da Fabrízia, possui uma localização ruim que limita um pouco a chegada e fica numa área onde as pessoas costumam sentar para tratar temas com a BP. Existe um local próximo a TV que parece ideal para nova localização, onde já existe um ponto de hidrante para uso em uma possível situação de risco.",
-      "status": "Em andamento",
+      "status": "Cancelado",
       "enviadoPor": "Weverton Rodrigues",
       "categoria": "Pequena mudança local",
       "subcategoria": "Safety - Health",
       "criada": "23-06-2026 14:36:03",
       "areaTrabalho": "09.10 Escritórios administrativos",
-      "atualizado": "14-07-2026 10:27:31",
+      "atualizado": "05-10-2026 14:51:23",
       "atribuidoA": "Tiago Carvalho",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "ADM/TÉCNICO/ASSISTENTE/ESTAG.",
-      "autor": "Weverton Rodrigues"
+      "autor": "Weverton Rodrigues",
+      "motivoCancelamento": "Mudança de extintor"
     },
     {
       "numero": "FB0156112",
@@ -11802,13 +11830,13 @@
       "numero": "FB0157458",
       "descricaoCurta": "Caixa de carregador pra tablete café cru",
       "descricao": "Estalar uma caixinha de carregador para carregar o tablete do café cru",
-      "status": "Em andamento",
+      "status": "Resolvido",
       "enviadoPor": "Thais Souza",
       "categoria": "Pequena mudança local",
       "subcategoria": "Organisation of work",
       "criada": "02-07-2026 21:05:36",
       "areaTrabalho": "04. LINHA 04",
-      "atualizado": "18-09-2026 09:50:35",
+      "atualizado": "05-10-2026 10:14:36",
       "atribuidoA": "",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
@@ -11876,8 +11904,8 @@
       "subcategoria": "Yeld",
       "criada": "09-07-2026 09:38:43",
       "areaTrabalho": "04. EMPACOTAMENTO",
-      "atualizado": "14-07-2026 12:39:18",
-      "atribuidoA": "",
+      "atualizado": "05-10-2026 14:44:16",
+      "atribuidoA": "Izabela Pugliesi",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "OPERAÇÃO",
@@ -12584,18 +12612,19 @@
       "numero": "FB0166449",
       "descricaoCurta": "FAIXA DE PEDESTRES - LOGÍSTICA",
       "descricao": "Não existe uma faixa de pedestres no \"caminho da logística\", que é usado geralmente em dias de chuva de forma alternativa.",
-      "status": "Em andamento",
+      "status": "Cancelado",
       "enviadoPor": "Weverton Rodrigues",
       "categoria": "Pequena mudança local",
       "subcategoria": "Safety - Health",
       "criada": "10-09-2026 08:39:57",
       "areaTrabalho": "09.10 Escritórios administrativos",
-      "atualizado": "17-09-2026 17:56:36",
+      "atualizado": "05-10-2026 15:32:44",
       "atribuidoA": "",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
       "fechado": "",
       "grupo": "ADM/TÉCNICO/ASSISTENTE/ESTAG.",
-      "autor": "Weverton Rodrigues"
+      "autor": "Weverton Rodrigues",
+      "motivoCancelamento": "FAIXA DE PEDESTRES - LOGÍSTICA"
     },
     {
       "numero": "FB0167262",
@@ -12737,16 +12766,16 @@
       "numero": "FB0169970",
       "descricaoCurta": "Instalação de máquina de snacks e bebidas no Espaço Café para ampliar as opções de alimentação e conveniência aos colaboradores.",
       "descricao": "Proponho a instalação de uma máquina de snacks e bebidas no Espaço Café, oferecendo aos colaboradores acesso prático a lanches, doces e bebidas durante a jornada de trabalho. A iniciativa não gera custo de locação para a empresa, sendo necessário apenas o investimento na instalação de duas tomadas elétricas para funcionamento do equipamento. Além disso, a empresa receberá um retorno financeiro correspondente a 5% do valor das vendas realizadas. A disponibilização da máquina contribuirá para aumentar a satisfação e o engajamento dos colaboradores, proporcionando mais comodidade, variedade de produtos e uma experiência positiva no ambiente de trabalho.",
-      "status": "Em andamento",
+      "status": "Fechado",
       "enviadoPor": "Ana Pereira",
       "categoria": "Pequena mudança local",
       "subcategoria": "Cost (GE, rework)",
       "criada": "01-10-2026 18:06:56",
       "areaTrabalho": "06. ADMINISTRATIVO",
-      "atualizado": "02-10-2026 10:04:41",
+      "atualizado": "28-10-2026 14:43:07",
       "atribuidoA": "",
       "grupoAtribuicao": "APROVADORES DE IDEIAS",
-      "fechado": "",
+      "fechado": "28-10-2026 14:43:07",
       "grupo": "ADM/TÉCNICO/ASSISTENTE/ESTAG.",
       "autor": "Ana Pereira"
     },
@@ -12800,6 +12829,261 @@
       "fechado": "",
       "grupo": "OPERAÇÃO",
       "autor": "Joao Rodrigues"
+    },
+    {
+      "numero": "FB0170879",
+      "descricaoCurta": "IDENTIFICAÇÃO NAS LIXEIRAS DO ADM",
+      "descricao": "Levando em consideração a importância da separação correta dos materiais que podem ser reciclados, gostaria de propor a ideia de identificar (assim como no refeitório), os itens que são considerados recicláveis para que possam ser colocados nas lixeiras azul e vermelha, indicando também aqueles que não são recicláveis na lixeira preta.",
+      "status": "Em andamento",
+      "enviadoPor": "Weverton Rodrigues",
+      "categoria": "Pequena mudança local",
+      "subcategoria": "Environment",
+      "criada": "08-10-2026 10:30:52",
+      "areaTrabalho": "09.10 Escritórios administrativos",
+      "atualizado": "09-10-2026 16:05:41",
+      "atribuidoA": "",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "fechado": "",
+      "grupo": "ADM/TÉCNICO/ASSISTENTE/ESTAG.",
+      "autor": "Weverton Rodrigues"
+    },
+    {
+      "numero": "FB0171049",
+      "descricaoCurta": "Purificador de água",
+      "descricao": "Instalar ponto de água, para um purificador. Na sala ADM do almoxarifado.",
+      "status": "Fechado",
+      "enviadoPor": "Aline Fernandes",
+      "categoria": "Pequena mudança local",
+      "subcategoria": "Organisation of work",
+      "criada": "09-10-2026 10:26:17",
+      "areaTrabalho": "01. JDE CAFES DO BRASIL UNIDADE PIUMHI",
+      "atualizado": "28-10-2026 14:42:29",
+      "atribuidoA": "",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "fechado": "28-10-2026 14:42:30",
+      "grupo": "ADM/TÉCNICO/ASSISTENTE/ESTAG.",
+      "autor": "Aline Fernandes"
+    },
+    {
+      "numero": "FB0171343",
+      "descricaoCurta": "Melhoria em sensor",
+      "descricao": "RP de Bojo de Espera da Camara dos Torradores, temos a dificuldade com os Sensores ( Fim de Curso ) do acionamento da mesma, para poder remover a RP do lugar ou é necessário desmontar todos os Sensores, tendo que marcar qual é qual para não \" perder \" a referência, abrir o Sensor e desconectar os Cabos para que seja necessário fazer revisão no mesmo ou no próprio local remover a tampa e deixar \" pendurado \" em local seguro, já que os cabos dos Sensores são razoavelmente curto, ideia seria para que não seja necessário remover a Tampa ou todo os Sensores e deixar \" pendurado \" ou semelhante, e sim, ter uma \" tomada \" onde seja fácil para desconectar dos Sensores sem precisar envolver mais um na atividade, fora que local da atividade além de ser um espaço apertado é Trabalho em Altura, então colocar uma \" tomada \" facilitaria a atividade",
+      "status": "Rascunho",
+      "enviadoPor": "Vinicius Aleixo",
+      "categoria": "Pequena mudança local",
+      "subcategoria": "Safety - Health",
+      "criada": "12-10-2026 17:58:03",
+      "areaTrabalho": "01. JDE CAFES DO BRASIL UNIDADE PIUMHI",
+      "atualizado": "12-10-2026 17:58:39",
+      "atribuidoA": "",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "fechado": "",
+      "grupo": "ADM/TÉCNICO/ASSISTENTE/ESTAG.",
+      "autor": "Vinicius Aleixo"
+    },
+    {
+      "numero": "FB0171704",
+      "descricaoCurta": "microfone sem fio",
+      "descricao": "Necessário um microfone sem fio ou microfone auricular que fica preso na cabeça que se projeta próximo a boca ou lateral do rosto… Para facilitar nas apresentações dos treinamentos da brigada qto outros treinamentos que ajudam na liberdade de movimentos e manter as mãos leves para melhor explicação",
+      "status": "Rascunho",
+      "enviadoPor": "Daniela Alves",
+      "categoria": "Pequena mudança local",
+      "subcategoria": "",
+      "criada": "14-10-2026 10:00:43",
+      "areaTrabalho": "04. LINHA 04",
+      "atualizado": "14-10-2026 10:00:43",
+      "atribuidoA": "",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "fechado": "",
+      "grupo": "OPERAÇÃO",
+      "autor": "Daniela Alves"
+    },
+    {
+      "numero": "FB0171705",
+      "descricaoCurta": "grade para tampa",
+      "descricao": "Necessário uma grade na tampa do tambores de rejeito detector de metal",
+      "status": "Rascunho",
+      "enviadoPor": "Daniela Alves",
+      "categoria": "Pequena mudança local",
+      "subcategoria": "",
+      "criada": "14-10-2026 10:05:30",
+      "areaTrabalho": "04. LINHA 04",
+      "atualizado": "14-10-2026 10:05:31",
+      "atribuidoA": "",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "fechado": "",
+      "grupo": "OPERAÇÃO",
+      "autor": "Daniela Alves"
+    },
+    {
+      "numero": "FB0171746",
+      "descricaoCurta": "Lava-copos automático no refeitório",
+      "descricao": "Instalar um lava-copos automático em inox de alta pressão na pia já existente do refeitório, permitindo que cada colaborador utilize seu próprio copo reutilizável durante as refeições e realize sua higienização antes e após o uso. A iniciativa visa substituir gradativamente o uso de copos descartáveis, promovendo maior sustentabilidade, redução na geração de resíduos e fortalecimento da cultura ambiental da unidade. O equipamento possui instalação simples e operação prática, incentivando a adesão dos colaboradores ao uso de recipientes reutilizáveis.",
+      "status": "Rascunho",
+      "enviadoPor": "Tiago Carvalho",
+      "categoria": "Pequena mudança local",
+      "subcategoria": "Environment",
+      "criada": "14-10-2026 18:01:54",
+      "areaTrabalho": "01. JDE CAFES DO BRASIL UNIDADE PIUMHI",
+      "atualizado": "14-10-2026 18:03:03",
+      "atribuidoA": "",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "fechado": "",
+      "grupo": "ADM/TÉCNICO/ASSISTENTE/ESTAG.",
+      "autor": "Tiago Carvalho"
+    },
+    {
+      "numero": "FB0171910",
+      "descricaoCurta": "os rádios",
+      "descricao": "Os rádios não para nas bases. Tem horas que demoramos muito para encontrar um radio disponível . Isso muitas das vezes acaba atrasando nosso trabalho e da manutenção também . Como as bases já são presas em cada máquina gostaria de sugerir uma corrente para prender os rádios também. O ideal seria que cada operador assinasse um compromisso de não retirar o rádio dali . Porque não tem necessidade de caminhar com o rádio digo pros operadores de máquina somente",
+      "status": "Rascunho",
+      "enviadoPor": "Romilda Cunha",
+      "categoria": "Pequena mudança local",
+      "subcategoria": "",
+      "criada": "15-10-2026 16:45:38",
+      "areaTrabalho": "01. JDE CAFES DO BRASIL UNIDADE PIUMHI",
+      "atualizado": "15-10-2026 16:45:38",
+      "atribuidoA": "",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "fechado": "",
+      "grupo": "OPERAÇÃO",
+      "autor": "Romilda Cunha"
+    },
+    {
+      "numero": "FB0172061",
+      "descricaoCurta": "colocar um rodo no banheiro feminino",
+      "descricao": "Para quando for tomar banho ter um rodo para puxar a água",
+      "status": "Rascunho",
+      "enviadoPor": "Thais Souza",
+      "categoria": "Pequena mudança local",
+      "subcategoria": "",
+      "criada": "16-10-2026 16:42:20",
+      "areaTrabalho": "04. LINHA 04",
+      "atualizado": "16-10-2026 16:50:14",
+      "atribuidoA": "",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "fechado": "",
+      "grupo": "OPERAÇÃO",
+      "autor": "Thais Souza"
+    },
+    {
+      "numero": "FB0172062",
+      "descricaoCurta": "abrir na tampa 3 entradas para encaixar as mangueiras das bicas",
+      "descricao": "Melhorar na poeira é na mistura de café q fica espalhados pelo chão",
+      "status": "Rascunho",
+      "enviadoPor": "Thais Souza",
+      "categoria": "Pequena mudança local",
+      "subcategoria": "",
+      "criada": "16-10-2026 16:50:14",
+      "areaTrabalho": "04. LINHA 04",
+      "atualizado": "16-10-2026 16:50:14",
+      "atribuidoA": "",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "fechado": "",
+      "grupo": "OPERAÇÃO",
+      "autor": "Thais Souza"
+    },
+    {
+      "numero": "FB0172142",
+      "descricaoCurta": "descer à valva do ar comprimido",
+      "descricao": "Facilidade de abertura e fechamento do ar comprimido. Porque temos q subir a escada sempre para está abrindo e fechando o ar comprimido",
+      "status": "Rascunho",
+      "enviadoPor": "Thais Souza",
+      "categoria": "Pequena mudança local",
+      "subcategoria": "",
+      "criada": "17-10-2026 17:34:25",
+      "areaTrabalho": "04. LINHA 04",
+      "atualizado": "17-10-2026 17:34:25",
+      "atribuidoA": "",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "fechado": "",
+      "grupo": "OPERAÇÃO",
+      "autor": "Thais Souza"
+    },
+    {
+      "numero": "FB0172309",
+      "descricaoCurta": "melhoria no sistema da comporta da encaixotadora parte traseira",
+      "descricao": "melhoria no sistema da comporta da encaixotadora parte traseira. Consiste na mudança do rolamento linear da parte traseira da comporta, pois esse rolamento e fabricado sob medida e não e facil de achar, para um que temos em estoque e padronizado pela parte frontal",
+      "status": "Em andamento",
+      "enviadoPor": "Arthur Silva",
+      "categoria": "Pequena mudança local",
+      "subcategoria": "Cost (GE, rework)",
+      "criada": "19-10-2026 06:37:50",
+      "areaTrabalho": "01. LINHA 01",
+      "atualizado": "27-10-2026 12:38:10",
+      "atribuidoA": "",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "fechado": "",
+      "grupo": "ADM/TÉCNICO/ASSISTENTE/ESTAG.",
+      "autor": "Arthur Silva"
+    },
+    {
+      "numero": "FB0172614",
+      "descricaoCurta": "Roteador dedicado para a Sala de Convivência",
+      "descricao": "Atualmente, a Sala de Convivência recebe o sinal de internet através de um repetidor Wi-Fi (inferência), o que ocasiona instabilidade e frequentes interrupções durante eventos, treinamentos, reuniões e videoconferências realizados no local. A proposta consiste em instalar um roteador dedicado conectado diretamente à rede corporativa, proporcionando maior cobertura, velocidade e estabilidade de conexão. A melhoria permitirá uma melhor experiência para colaboradores, visitantes e fornecedores, reduzindo falhas de comunicação e interrupções em atividades que dependem de internet.",
+      "status": "Rascunho",
+      "enviadoPor": "Tiago Carvalho",
+      "categoria": "Pequena mudança local",
+      "subcategoria": "Organisation of work",
+      "criada": "20-10-2026 10:50:27",
+      "areaTrabalho": "09.20 SALA DE REUNIÃO",
+      "atualizado": "20-10-2026 10:50:53",
+      "atribuidoA": "",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "fechado": "",
+      "grupo": "ADM/TÉCNICO/ASSISTENTE/ESTAG.",
+      "autor": "Tiago Carvalho"
+    },
+    {
+      "numero": "FB0172618",
+      "descricaoCurta": "Instalação de abertura para descarte direto de papel toalha na bancada da pia da copa/refeitório",
+      "descricao": "Realizar a instalação de uma abertura circular com aro de acabamento na bancada da pia da copa/refeitório, posicionada diretamente acima da lixeira existente. A melhoria permitirá que os colaboradores descartem papel toalha diretamente pelo orifício da bancada, eliminando a necessidade de manusear tampas ou se deslocar até a lixeira. A solução torna o descarte mais rápido, prático e higiênico, contribuindo para a organização e limpeza do ambiente. Alem de otmizar a circulação do espaço que é pequeno.",
+      "status": "Rascunho",
+      "enviadoPor": "Tiago Carvalho",
+      "categoria": "Pequena mudança local",
+      "subcategoria": "Environment",
+      "criada": "20-10-2026 12:20:22",
+      "areaTrabalho": "09.17 REFEITÓRIO",
+      "atualizado": "20-10-2026 12:21:37",
+      "atribuidoA": "",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "fechado": "",
+      "grupo": "ADM/TÉCNICO/ASSISTENTE/ESTAG.",
+      "autor": "Tiago Carvalho"
+    },
+    {
+      "numero": "FB0173788",
+      "descricaoCurta": "Separação de madeira no refeitório",
+      "descricao": "Identificamos diversos momentos como: Sobremesa picolé (palito), mexedor de café, onde não existe um local adequado para deixar a madeira, sendo destinada a lixeira preta. Caso seja reciclável, gostaria de entender a possibilidade de incluir a lixeirinha para madeira, sendo assim, possível recolher e destinar corretamente.",
+      "status": "Rascunho",
+      "enviadoPor": "Weverton Rodrigues",
+      "categoria": "Pequena mudança local",
+      "subcategoria": "",
+      "criada": "27-10-2026 12:07:15",
+      "areaTrabalho": "09.10 Escritórios administrativos",
+      "atualizado": "27-10-2026 12:07:15",
+      "atribuidoA": "",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "fechado": "",
+      "grupo": "ADM/TÉCNICO/ASSISTENTE/ESTAG.",
+      "autor": "Weverton Rodrigues"
+    },
+    {
+      "numero": "FB0174003",
+      "descricaoCurta": "calha interna da PKD",
+      "descricao": "A calha , onde o cafe dentro da PKD cai e que é aspirado ao fim de cada turno. Talvez ele possa ser reaproveitado , se fizer uma boa limpeza na calha e nos coletores ,que já são de inox, podemos aproveitar todo o café. Ao invés de usar o aspirador vamos utilizar varre mesa limpos e higienizados para jogar todo o café dentro dos coletores, depois passamos pela peneira vibratória 28/10 - Giovanna: Alice, poderia validar do ponto de vista de QA, a questão do varremesa para jogar o café e o recipiente de inox que existe? É um impacto importante de descarte. Avaliando ali com a Romilda, a única coisa que acho que precisamos fazer é colocar uma tampa que deixe somente a abertura da calha - igual ao lado tem o carrinho da balanca, que a abertura fica bem certinha.",
+      "status": "Em andamento",
+      "enviadoPor": "Romilda Cunha",
+      "categoria": "Pequena mudança local",
+      "subcategoria": "Yeld",
+      "criada": "28-10-2026 15:13:44",
+      "areaTrabalho": "01. JDE CAFES DO BRASIL UNIDADE PIUMHI",
+      "atualizado": "28-10-2026 22:18:18",
+      "atribuidoA": "Alice Morais",
+      "grupoAtribuicao": "APROVADORES DE IDEIAS",
+      "fechado": "",
+      "grupo": "OPERAÇÃO",
+      "autor": "Romilda Cunha"
     }
   ],
   "canceladas": [
@@ -12922,6 +13206,14 @@
     {
       "numero": "FB0087245",
       "motivo": "colocar as limpeza t3 cil"
+    },
+    {
+      "numero": "FB0166449",
+      "motivo": "FAIXA DE PEDESTRES - LOGÍSTICA"
+    },
+    {
+      "numero": "FB0155992",
+      "motivo": "Mudança de extintor"
     }
   ],
   "reconhecidas": {
@@ -12929,6 +13221,24 @@
     "semestre": []
   },
   "historicoAtualizacoes": [
+    {
+      "timestamp": "2026-10-30T18:33:34.185Z",
+      "file": "KPIS DASH - PROGRAMA DE IDEIAS (1).xlsx",
+      "reason": "Atualização da base de ideias",
+      "responsible": "Administração",
+      "ideas": 628,
+      "collaborators": 124,
+      "areas": 17
+    },
+    {
+      "timestamp": "2026-10-30T18:30:29.479Z",
+      "file": "KPIS DASH - PROGRAMA DE IDEIAS (1).xlsx",
+      "reason": "Atualização da base de ideias",
+      "responsible": "Administração",
+      "ideas": 628,
+      "collaborators": 121,
+      "areas": 17
+    },
     {
       "timestamp": "2026-10-30T17:23:49.810Z",
       "file": "KPIS DASH - PROGRAMA DE IDEIAS.xlsx",
